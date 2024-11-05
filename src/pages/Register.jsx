@@ -1,15 +1,15 @@
 import React from 'react'
 import Navbar from '../components/Navbar'
 
-const cart = () => {
+const Register = () => {
   return (
     <>
     <Navbar/>
     <div>
-      This is cart Page
+      this is Register page
     </div>
     </>
   )
 }
 
-export default cart
+export default Register

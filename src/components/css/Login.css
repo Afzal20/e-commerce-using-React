@@ -1,0 +1,148 @@
+/* src/css/login.css */
+
+:root {
+    --brand-color: #D2b332;
+    --hover-brand-color: #AE51FF;
+    --brand-primary-color: #464958;
+    --brand-secondary-color: #e4d28c;
+    --custom-white: #f5eed1;
+    --size-3: 1.2em;
+    --shadow-1: 0 0 15px 10px rgba(var(#fff), .2);
+    --shadow-2: 20px 20px 30px rgba(var(--brand-color), .2);
+    --product-shadow: 20px 20px 30px rgba(var(var(--brand-color)));
+    --logo-width : 70px;
+    --icons-height : 20px;
+    /* --slider-and-categories-height : 350px; */
+    --border-radius : 5px;
+}
+
+.container-forms {
+    position: inherit;
+    top: 0;
+    width: 100%;
+    padding: 0;
+    height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form {
+    background-color: var(--brand-color);
+    border-radius: var(--border-radius);
+    max-width: 500px;
+    width: 100%;
+    padding: 30px; /* Reduced padding */
+    text-align: center;
+}
+
+.login-text {
+    font-size: 30px;
+    text-transform: capitalize;
+}
+
+.field input {
+    width: 100%;
+    height: 50px;
+    margin-top: 20px;
+    border-radius: 5px;
+    border: none !important;
+    font-size: 18px;
+}
+
+.form-link {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.field input::placeholder {
+    font-size: 18px;
+    color: var(--brand-color);
+    margin: auto;
+}
+
+.field button {
+    position: relative;
+    height: 50px;
+    width: 100%;
+    font-size: 25px;
+    margin-top: 40px;
+    border-radius: 5px;
+    border: none !important;
+    background-color: var(--brand-secondary-color);
+    text-transform: capitalize;
+    cursor: pointer;
+}
+
+.field button:hover {
+    background-color: var(--hover-brand-color);
+}
+
+.form-link h3 {
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+.form-link a {
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.form-link a:hover {
+    text-decoration: underline;
+}
+
+.divider {
+    height: 1px;
+    width: 100%;
+    background-color: var(--brand-primary-color);
+    position: relative;
+    top: 10px;
+    width: 100%;
+    height: 1px;
+    background-color: var(--brand-primary-color);
+    margin: 20px 0;
+}
+
+.divider::before {
+    content: 'or';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--brand-color);
+    padding: 10px;
+}
+
+.continue-with-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--brand-secondary-color);
+    border: none;
+    cursor: pointer;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px;
+    border-radius: var(--border-radius);
+    width: 100%;
+}
+
+.continue-with-google img {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    margin: auto;
+}
+
+.continue-with-google h3 {
+    font-size: 20px;
+    color: var(--brand-primary-color);
+    text-transform: capitalize;
+    margin: auto;
+}
+
+.continue-with-google:hover {
+    background-color: var(--hover-brand-color);
+}
