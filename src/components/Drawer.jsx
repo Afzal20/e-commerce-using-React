@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
-import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
@@ -36,6 +35,7 @@ const PersistentDrawerLeft = ({ open, handleDrawerClose, onCategorySelect }) => 
         if (response.ok) {
           const data = await response.json();
           setCategories(data);
+          // console.log(data.map((category) => category.name));
         } else {
           console.error('Failed to fetch categories');
         }
@@ -58,6 +58,7 @@ const PersistentDrawerLeft = ({ open, handleDrawerClose, onCategorySelect }) => 
     }
     setSelectedCategories(newChecked);
     onCategorySelect(newChecked); 
+    console.log(newChecked.name);
   };
 
   return (
