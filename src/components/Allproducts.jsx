@@ -3,8 +3,13 @@ import { useProducts } from '../context/ProductsContext';
 import { Grid, Container, CircularProgress, Typography, Box } from '@mui/material';
 import ProductCard from './ProductCard';
 
-const AllProducts = () => {
+const AllProducts = ({ selectedCategories }) => {
   const { products, loading, error } = useProducts();
+
+  // Filter products by selected categories
+  const filteredProducts = products.filter(product =>
+    selectedCategories.length === 0 || selectedCategories.includes(product.category.name)
+  );
 
   if (loading) {
     return (
@@ -30,8 +35,8 @@ const AllProducts = () => {
         All Products
       </Typography>
       <Grid container spacing={2}>
-        {products.length > 0 ? (
-          products.map((product) => (
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((product) => (
             <Grid item key={product.id} xs={6} sm={4} md={3} lg={2.4}>
               <ProductCard product={product} />
             </Grid>

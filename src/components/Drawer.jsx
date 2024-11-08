@@ -50,17 +50,17 @@ const PersistentDrawerLeft = ({ open, handleDrawerClose, onCategorySelect }) => 
   const handleCheckboxChange = (category) => {
     const currentIndex = selectedCategories.indexOf(category);
     const newChecked = [...selectedCategories];
-
+  
     if (currentIndex === -1) {
       newChecked.push(category);
     } else {
       newChecked.splice(currentIndex, 1);
     }
+  
     setSelectedCategories(newChecked);
     onCategorySelect(newChecked); 
-    console.log(newChecked.name);
   };
-
+  
   return (
     <Drawer
       sx={{
@@ -69,6 +69,7 @@ const PersistentDrawerLeft = ({ open, handleDrawerClose, onCategorySelect }) => 
         '& .MuiDrawer-paper': {
           width: drawerWidth,
           boxSizing: 'border-box',
+          backgroundColor: '#D2b332',
         },
       }}
       variant="persistent"
