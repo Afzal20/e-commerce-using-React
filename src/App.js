@@ -4,9 +4,9 @@ import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
 import ProductPage from './pages/ProductPage';
 import Basic from './pages/cart';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import Login from './pages/LoginPage';
 import { ProductsProvider } from './context/ProductsContext'; // Ensure you import ProductsProvider
+import RegistrationPage from './pages/RegistrationPage';
 
 const isAuthenticated = () => {
   return localStorage.getItem('authToken');
@@ -26,7 +26,7 @@ const App = () => {
           <Route path="/product/:product_id" element={<ProductPage />} />
           <Route path="/cart" element={<Basic />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/register" element={<RegistrationPage/>} />
         </Routes>
       </ProductsProvider>
     </Router>
