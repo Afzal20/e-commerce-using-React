@@ -49,7 +49,7 @@ export default function CustomRegistrationFrom() {
         Welcome To Bindu-Britto!
       </Typography>
       <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
-        Log in to your account
+        Register Now
       </Typography>
 
       <Button
@@ -132,13 +132,9 @@ export default function CustomRegistrationFrom() {
       >
         Sign Up
       </Button>
-
-      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-        <a href="#" style={{ color: '#1976d2', textDecoration: 'none' }}>Forgot your password?</a>
-      </Typography>
       <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
-        <a href="#" style={{ color: '#1976d2', textDecoration: 'none' }}>
-          Don't have an account? Sign up
+        <a href="/login" style={{ color: '#1976d2', textDecoration: 'none' }}>
+          Allrady have an account? Sign in.
         </a>
       </Typography>
     </Box>

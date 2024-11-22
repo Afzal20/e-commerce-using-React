@@ -113,7 +113,7 @@ export default function CustomLoginForm() {
         <a href="#" style={{ color: '#1976d2', textDecoration: 'none' }}>Forgot your password?</a>
       </Typography>
       <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
-        <a href="#" style={{ color: '#1976d2', textDecoration: 'none' }}>
+        <a href="/register" style={{ color: '#1976d2', textDecoration: 'none' }}>
           Don't have an account? Sign up
         </a>
       </Typography>

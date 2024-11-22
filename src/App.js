@@ -3,10 +3,11 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
 import ProductPage from './pages/ProductPage';
-import Basic from './pages/cart';
+import CartPage from './pages/CartPage';
 import Login from './pages/LoginPage';
 import { ProductsProvider } from './context/ProductsContext'; // Ensure you import ProductsProvider
 import RegistrationPage from './pages/RegistrationPage';
+import OrderProcessPage from './pages/OrderProcessPage';
 
 const isAuthenticated = () => {
   return localStorage.getItem('authToken');
@@ -24,9 +25,10 @@ const App = () => {
           />
           <Route path="/product" element={<ProductPage />} />
           <Route path="/product/:product_id" element={<ProductPage />} />
-          <Route path="/cart" element={<Basic />} />
+          <Route path="/cart" element={<CartPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegistrationPage/>} />
+          <Route path="/order" element={<OrderProcessPage/>} />
         </Routes>
       </ProductsProvider>
     </Router>
