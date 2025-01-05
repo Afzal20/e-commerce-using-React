@@ -13,6 +13,7 @@ const isAuthenticated = () => {
   return localStorage.getItem('authToken');
 };
 
+ 
 const App = () => {
   return (
     <Router>
