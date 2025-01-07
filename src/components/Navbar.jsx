@@ -115,7 +115,7 @@ export default function Navbar() {
 
     return (
         <Box sx={{ flexGrow: 1 }}>
-            <AppBar position="static">
+            <AppBar position="static" sx={{ backgroundColor: "#010414" }}>
                 <Toolbar>
                     <Typography component="div" sx={{ display: 'flex', alignItems: 'center' }}>
                         <img src={logo} alt="logo" style={{ height: '40px', marginRight: '8px' }} />
