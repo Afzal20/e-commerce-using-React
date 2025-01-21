@@ -5,11 +5,11 @@ const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#eee',
+      main: '#000',
     },
-    background: {
-      default: '#f3e6af', 
-    },
+    // background: {
+    //   default: '#f3e6af', 
+    // },
   },
 });
 

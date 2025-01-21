@@ -8,6 +8,9 @@ import Login from './pages/LoginPage';
 import { ProductsProvider } from './context/ProductsContext'; // Ensure you import ProductsProvider
 import RegistrationPage from './pages/RegistrationPage';
 import OrderProcessPage from './pages/OrderProcessPage';
+import EmailVerification from './pages/EmailVerification';
+import ChangePassword from './pages/ChangePassword';
+import ResetPassword from './pages/ResetPassword';
 
 const isAuthenticated = () => {
   return localStorage.getItem('authToken');
@@ -30,6 +33,11 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegistrationPage/>} />
           <Route path="/order" element={<OrderProcessPage/>} />
+          <Route path="dj-rest-auth/registration/account-confirm-email/:key/" Component={EmailVerification}></Route>
+          {/* <Route path="reset/password/confirm/:uid/:token" Component={ResetPasswordConfirm}></Route> */}
+          <Route path="change/password/" Component={ChangePassword}></Route>
+          <Route path="reset/password/" Component={ResetPassword}></Route>
+            
         </Routes>
       </ProductsProvider>
     </Router>

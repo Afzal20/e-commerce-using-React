@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import axios from 'axios';
 
 export default function CustomLoginForm() {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -14,6 +15,7 @@ export default function CustomLoginForm() {
     email: '',
     password: '',
   });
+  const [error, setError] = React.useState('');
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -25,10 +27,32 @@ export default function CustomLoginForm() {
     setFormValues({ ...formValues, [prop]: event.target.value });
   };
 
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
-    // Handle login logic here
-    console.log('Login form submitted:', formValues);
+    if (!formValues.email || !formValues.password) {
+      setError('Email and password are required.');
+      return;
+    }
+
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+      const body = JSON.stringify({
+        email: formValues.email,
+        password: formValues.password,
+      });
+
+      const response = await axios.post("http://localhost:8000/dj-rest-auth/login/", body, config);
+      console.log("Login successful:", response.data);
+      alert('Login successful!');
+      setError(''); // Clear any previous errors
+    } catch (err) {
+      console.error('Error during login:', err.response?.data || err.message);
+      setError('Login failed. Please check your credentials.');
+    }
   };
 
   return (
@@ -50,6 +74,12 @@ export default function CustomLoginForm() {
       <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
         Log in to your account
       </Typography>
+
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
 
       <Button
         variant="outlined"

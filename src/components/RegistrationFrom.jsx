@@ -1,14 +1,14 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import axios from 'axios';
 
-export default function CustomRegistrationFrom() {
+export default function CustomRegistrationForm() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [formValues, setFormValues] = React.useState({
     email: '',
@@ -26,10 +26,19 @@ export default function CustomRegistrationFrom() {
     setFormValues({ ...formValues, [prop]: event.target.value });
   };
 
-  const handleLogin = (event) => {
+  const handleSignUp = async (event) => {
     event.preventDefault();
-    // Handle login logic here
-    console.log('Login form submitted:', formValues);
+    try {
+      await axios.post('http://localhost:8000/dj-rest-auth/registration/', {
+        email: formValues.email,
+        password1: formValues.password,
+        password2: formValues.confirmPassword,
+      });
+      alert('Registration successful! check your email to verify your account.');
+    } catch (error) {
+      console.error('Error during registration:', error.response?.data || error.message);
+      alert('Registration failed! Please try again latter.');
+    }
   };
 
   return (
@@ -52,24 +61,8 @@ export default function CustomRegistrationFrom() {
         Register Now
       </Typography>
 
-      <Button
-        variant="outlined"
-        fullWidth
-        startIcon={<img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google icon" width="20" />}
-        sx={{
-          mb: 2,
-          textTransform: 'none',
-          color: 'text.primary',
-          borderColor: 'grey.400',
-        }}
-      >
-        Continue with Google
-      </Button>
-
-      <Divider sx={{ my: 2 }}>or</Divider>
-
       <TextField
-        label="Email address"
+        label="Email Address"
         variant="outlined"
         fullWidth
         value={formValues.email}
@@ -84,7 +77,7 @@ export default function CustomRegistrationFrom() {
         type={showPassword ? 'text' : 'password'}
         value={formValues.password}
         onChange={handleChange('password')}
-        sx={{ mb: 3 }}
+        sx={{ mb: 2 }}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -100,13 +93,13 @@ export default function CustomRegistrationFrom() {
         }}
       />
 
-        <TextField
+      <TextField
         label="Confirm Password"
         variant="outlined"
         fullWidth
         type={showPassword ? 'text' : 'password'}
-        value={formValues.password}
-        onChange={handleChange('password')}
+        value={formValues.confirmPassword}
+        onChange={handleChange('confirmPassword')}
         sx={{ mb: 3 }}
         InputProps={{
           endAdornment: (
@@ -128,13 +121,14 @@ export default function CustomRegistrationFrom() {
         fullWidth
         color="primary"
         sx={{ mb: 2, fontWeight: 'bold', textTransform: 'none' }}
-        onClick={handleLogin}
+        onClick={handleSignUp}
       >
         Sign Up
       </Button>
+
       <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
         <a href="/login" style={{ color: '#1976d2', textDecoration: 'none' }}>
-          Allrady have an account? Sign in.
+          Already have an account? Sign in.
         </a>
       </Typography>
     </Box>
