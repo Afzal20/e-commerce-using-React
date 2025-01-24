@@ -317,7 +317,7 @@ const ProductDetails = () => {
             </Paper>
           </Grid>
         </Grid>
-        <RelatedProducts />
+        <RelatedProducts ProductCategory={ProductCategory}/>
       </Box>
     </>
   );

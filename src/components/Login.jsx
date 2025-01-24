@@ -48,9 +48,10 @@ export default function CustomLoginForm() {
 
       const response = await axios.post("http://localhost:8000/dj-rest-auth/login/", body, config);
       // console.log("Login successful:", response.data);
-      localStorage.setItem("token", response);
+      localStorage.setItem("token", JSON.stringify(response.data));
       alert('Login successful!');
-      navigate("/");
+      setError('');
+      window.location.href = '/';
       setError(''); // Clear any previous errors
     } catch (err) {
       console.error('Error during login:', err.response?.data || err.message);
