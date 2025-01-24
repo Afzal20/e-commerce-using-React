@@ -6,7 +6,10 @@ import Rating from '@mui/material/Rating';
 import QuantityInput from '../components/QuantityInput';
 import { useParams, useNavigate } from 'react-router-dom';
 import { BaseUrls } from '../env';
-import RelatedProducts from '../components/ReletedProducts';
+import RadioGroup from '@mui/material/RadioGroup';
+import Radio from '@mui/material/Radio';
+import RelatedProducts from './ReletedProducts';
+
 
 const ProductDetails = () => {
   const { product_id } = useParams();
@@ -45,9 +48,7 @@ const ProductDetails = () => {
   }, [ItemsUrls]);
 
   const handleAddToCart = () => {
-    console.log('Quantity added to cart:', quantity);
-    console.log('Selected color:', selectedColor);
-    console.log('Selected size:', selectedSize);
+    
   };
 
   const handleBuyNow = () => {
@@ -183,17 +184,38 @@ const ProductDetails = () => {
                   </Typography>
                   <Box>
                     {productData.colors?.map((color) => (
-                      <Button
-                        key={color}
-                        variant="outlined"
+                      <RadioGroup
+                        row
+                        aria-label="colors"
+                        name="row-radio-buttons-group"
                         sx={{
-                          margin: 1,
-                          color: '#000000',
-                          borderColor: '#000000',
+                          display: 'flex',
+                          alignItems: 'center', // Vertically align the radio and text in the center
                         }}
                       >
-                        {color}
-                      </Button>
+                        <Radio
+                          key={color}
+                          value={color}
+                          checked={selectedColor === color}
+                          onChange={() => setselectedColor(color)}
+                          sx={{
+                            color: color, // Default (unchecked) color
+                            '&.Mui-checked': {
+                              color: color, // Checked color
+                            },
+                          }}
+                        />
+                        <span
+                          style={{
+                            color: selectedColor === color ? color : '#000000', // Set text color based on selected state
+                            marginLeft: '8px', // Optional spacing between the radio and text
+                            display: 'inline-flex', // Ensures text stays on the same line as the radio button
+                            alignItems: 'center', // Vertically aligns the text with the radio button
+                          }}
+                        >
+                          {color}
+                        </span>
+                      </RadioGroup>
                     ))}
                   </Box>
                 </Grid>
@@ -204,20 +226,36 @@ const ProductDetails = () => {
                   </Typography>
                   <Box>
                     {productData.sizes?.map((size) => (
-                      <Button
-                        key={size}
-                        variant="outlined"
+                      <RadioGroup
+                        row
+                        aria-label="sizes"
+                        name="row-radio-buttons-group"
                         sx={{
-                          margin: 1,
-                          color: '#000000',
-                          borderColor: '#000000',
+                          display: 'flex',
+                          alignItems: 'center', // Vertically align the radio and text in the center
                         }}
+                        key={size} // Add key here for each size
                       >
-                        {size}
-                      </Button>
+                        <Radio
+                          value={size} // Set the size as the value
+                          checked={selectedSize === size} // Check if this size is selected
+                          onChange={() => setselectedSize(size)} // Update the selected size
+                          sx={{
+                            
+                          }}
+                        />
+                        <span
+                          style={{
+                            marginLeft: '8px', // Spacing between the radio and text
+                            display: 'inline-flex', // Keep text in line with the radio button
+                            alignItems: 'center', // Align text and radio button vertically
+                          }}
+                        >
+                          {size}
+                        </span>
+                      </RadioGroup>
                     ))}
                   </Box>
-
                   <Box sx={{ margin: '10px' }}>
                     <QuantityInput value={quantity} onChange={handleQuantityChange} />
                   </Box>
