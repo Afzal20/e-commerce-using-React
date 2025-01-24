@@ -7,33 +7,7 @@ const EmailVerification = () => {
   const [message, setMessage] = useState('');
 
   const handleVerifyEmail = async () => {
-    setLoading(true);
-    setMessage('');
-
-    const token = localStorage.getItem('access'); // Retrieve the token from local storage
-    if (!token) {
-      setMessage('Access token not found. Please log in first.');
-      setLoading(false);
-      return;
-    }
-
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-
-    const body = JSON.stringify({ token });
-
-    try {
-      await axios.post('http://localhost:8000/dj-rest-auth/token/verify/', body, config);
-      setMessage('Email verified successfully! Your account is now activated.');
-    } catch (error) {
-      console.error('Error during email verification:', error.response?.data || error.message);
-      setMessage('Failed to verify email. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    
   };
 
   return (

@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './css/ProductCard.css'; // Assuming you have a separate CSS file for styling
+import './css/ProductCard.css';
 
 const ProductCard = ({ product }) => {
   return (
     <div className="product-card">
+      {/* Single Link wrapping the entire card */}
       <Link to={`/product/${product.product_id}`} className="product-link">
         <div className="product-image">
           <img src={product.image} alt={product.title} />
@@ -25,9 +26,8 @@ const ProductCard = ({ product }) => {
           <p className="product-stock">
             {product.number_of_items > 0 ? "In Stock" : "Out of Stock"}
           </p>
-          <Link to={`/product/${product.product_id}`} className="view-details">
-            View Details
-          </Link>
+          {/* Removed nested Link */}
+          <span className="view-details">View Details</span>
         </div>
       </Link>
     </div>

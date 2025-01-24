@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Grid, Paper } from '@mui/material';
 import AddShoppingCartTwoToneIcon from '@mui/icons-material/AddShoppingCartTwoTone';
 import ShoppingBasketOutlinedIcon from '@mui/icons-material/ShoppingBasketOutlined';
+import Rating from '@mui/material/Rating';
 import QuantityInput from '../components/QuantityInput';
 import { useParams, useNavigate } from 'react-router-dom';
 import { BaseUrls } from '../env';
@@ -14,7 +15,9 @@ const ProductDetails = () => {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [mainImage, setMainImage] = useState('');
-  const [ProductCategory, setProductCategory] = useState(''); // Initialize as an empty string
+  const [ProductCategory, setProductCategory] = useState('');
+  const [selectedColor, setselectedColor] = useState([]);
+  const [selectedSize, setselectedSize] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,8 +27,14 @@ const ProductDetails = () => {
         if (!response.ok) throw new Error('Failed to fetch data');
         const data = await response.json();
         setItems(data);
-        setProductCategory(data.category); // Correctly update the category
-        setMainImage(data.image || ''); // Set initial main image after data is fetched
+        setProductCategory(data.category);
+        setMainImage(data.image || '');
+        if (data.item_color) {
+          setselectedColor(data.item_color[0].color.name);
+        }
+        if (data.item_size) {
+          setselectedSize(data.item_size[0].size.name);
+        }
       } catch (error) {
         console.error('Error fetching items:', error);
       } finally {
@@ -37,15 +46,21 @@ const ProductDetails = () => {
 
   const handleAddToCart = () => {
     console.log('Quantity added to cart:', quantity);
-    // Implement actual cart addition logic here
+    console.log('Selected color:', selectedColor);
+    console.log('Selected size:', selectedSize);
   };
 
   const handleBuyNow = () => {
-    navigate('/checkout');
+    // navigate('/checkout');
+    console.log('Quantity added to cart:', quantity);
+    console.log('Selected color:', selectedColor);
+    console.log('Selected size:', selectedSize);
   };
 
   const handleImageClick = (index) => {
-    setMainImage(items.images[index].image); // Set clicked image as main
+    if (items.images && items.images[index]) {
+      setMainImage(items.images[index].image);
+    }
   };
 
   const handleQuantityChange = (newQuantity) => {
@@ -63,35 +78,55 @@ const ProductDetails = () => {
   if (loading || !items) return <Typography>Loading...</Typography>;
 
   const productData = {
-    title: items.title,
-    price: items.price,
-    discountPrice: items.discount_price,
-    description: items.description,
-    colors: items.item_color?.map(c => c.color.name),
-    sizes: items.item_size?.map(s => s.size.name),
+    title: items.title || 'No Title Available',
+    price: items.price || 0,
+    discountPrice: items.discount_price || items.price,
+    description: items.description || 'No description available',
+    colors: items.item_color?.map((c) => c.color.name) || ['No colors available'],
+    sizes: items.item_size?.map((s) => s.size.name) || ['No sizes available'],
     mainImage: items.image,
     material: '100% cotton, 170gsm',
     printQuality: 'DTF Print',
-    deliveryCharge: 'Inside Dhaka 80 taka, Outside Dhaka 120 taka',
+    deliveryCharge: '80 taka',
     deliveryTime: '3-5 Days',
+    rating: items.ratings?.value || 0,
   };
 
   return (
     <>
       <Box sx={{ width: '100%' }}>
-        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} sx={{ pt: 2, pb: 2, pl: { xs: 2, sm: 4, md: 10 }, pr: { xs: 2, sm: 4, md: 4 } }}>
+        <Grid
+          container
+          rowSpacing={1}
+          columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+          sx={{
+            pt: 2,
+            pb: 2,
+            pl: { xs: 2, sm: 4, md: 10 },
+            pr: { xs: 2, sm: 4, md: 4 },
+          }}
+        >
           <Grid item xs={12} sm={6} md={6}>
             <Box sx={{ width: '100%', textAlign: 'center' }}>
               <Box sx={{ mb: 2 }}>
-                <img src={`http://localhost:8000${mainImage}`} alt="Big" style={{ width: '100%', borderRadius: '5px' }} />
+                <img
+                  src={mainImage || 'https://via.placeholder.com/500'}
+                  alt="Main Product"
+                  style={{ width: '100%', borderRadius: '5px' }}
+                />
               </Box>
               <Grid container spacing={2} justifyContent="center">
                 {items.images?.map((img, index) => (
                   <Grid item key={index} xs={3}>
                     <img
-                      src={`http://localhost:8000${img.image}`}
-                      alt={`Small ${index + 1}`}
-                      style={{ width: '100%', cursor: 'pointer', borderRadius: '5px' }}
+                      src={img.image || 'https://via.placeholder.com/100'}
+                      alt={`Thumbnail ${index + 1}`}
+                      style={{
+                        width: '100%',
+                        cursor: 'pointer',
+                        borderRadius: '5px',
+                        border: mainImage === img.image ? '2px solid #E7C400' : 'none',
+                      }}
                       onClick={() => handleImageClick(index)}
                     />
                   </Grid>
@@ -107,7 +142,10 @@ const ProductDetails = () => {
                   <Typography variant="h6" sx={{ color: '#000000' }}>
                     Home / REGULAR COLLECTION / {productData.title}
                   </Typography>
-                  <Typography variant="h4" sx={{ marginTop: 2, fontWeight: 'bold', color: '#000000' }}>
+                  <Typography
+                    variant="h4"
+                    sx={{ marginTop: 2, fontWeight: 'bold', color: '#000000' }}
+                  >
                     {productData.title}
                   </Typography>
                   <Typography variant="h5" sx={{ marginTop: 1, color: '#000000' }}>
@@ -134,6 +172,9 @@ const ProductDetails = () => {
                   <Typography variant="body1" sx={{ color: '#000000' }}>
                     Delivery Time: {productData.deliveryTime}
                   </Typography>
+                  <Typography variant="body1" sx={{ color: '#000000', mt: 2 }}>
+                    <Rating value={productData.rating} readOnly />
+                  </Typography>
                 </Grid>
 
                 <Grid item xs={12}>
@@ -142,7 +183,15 @@ const ProductDetails = () => {
                   </Typography>
                   <Box>
                     {productData.colors?.map((color) => (
-                      <Button key={color} variant="outlined" sx={{ margin: 1, color: '#000000', borderColor: '#000000' }}>
+                      <Button
+                        key={color}
+                        variant="outlined"
+                        sx={{
+                          margin: 1,
+                          color: '#000000',
+                          borderColor: '#000000',
+                        }}
+                      >
                         {color}
                       </Button>
                     ))}
@@ -155,7 +204,15 @@ const ProductDetails = () => {
                   </Typography>
                   <Box>
                     {productData.sizes?.map((size) => (
-                      <Button key={size} variant="outlined" sx={{ margin: 1, color: '#000000', borderColor: '#000000' }}>
+                      <Button
+                        key={size}
+                        variant="outlined"
+                        sx={{
+                          margin: 1,
+                          color: '#000000',
+                          borderColor: '#000000',
+                        }}
+                      >
                         {size}
                       </Button>
                     ))}
