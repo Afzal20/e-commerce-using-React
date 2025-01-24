@@ -10,7 +10,6 @@ import RadioGroup from '@mui/material/RadioGroup';
 import Radio from '@mui/material/Radio';
 import RelatedProducts from './ReletedProducts';
 
-
 const ProductDetails = () => {
   const { product_id } = useParams();
   const ItemsUrls = `${BaseUrls}items/${product_id}/`;
@@ -19,8 +18,8 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const [mainImage, setMainImage] = useState('');
   const [ProductCategory, setProductCategory] = useState('');
-  const [selectedColor, setselectedColor] = useState([]);
-  const [selectedSize, setselectedSize] = useState([]);
+  const [selectedColor, setselectedColor] = useState('');
+  const [selectedSize, setselectedSize] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,14 +47,27 @@ const ProductDetails = () => {
   }, [ItemsUrls]);
 
   const handleAddToCart = () => {
-    
+    // Retrieve the user email from localStorage or context
+    const user = JSON.parse(localStorage.getItem('user')); // Replace this with your actual method of retrieving user details
+  
+    if (user && user.email) {
+      console.log('User Email:', user.email);
+    } else {
+      console.log('User not logged in or email not found.');
+    }
+  
+    console.log('Item added to cart');
+    console.log('Product ID:', items.product_id);
+    console.log('Quantity:', quantity);
+    console.log('Selected Color:', selectedColor);
+    console.log('Selected Size:', selectedSize);
   };
-
+  
   const handleBuyNow = () => {
-    // navigate('/checkout');
-    console.log('Quantity added to cart:', quantity);
-    console.log('Selected color:', selectedColor);
-    console.log('Selected size:', selectedSize);
+    // Assuming cart addition here
+    console.log('Proceeding to checkout...');
+    // navigate to checkout page
+    navigate('/checkout');
   };
 
   const handleImageClick = (index) => {
@@ -66,7 +78,7 @@ const ProductDetails = () => {
 
   const handleQuantityChange = (newQuantity) => {
     const minQuantity = 1;
-    const maxQuantity = 100; // Example maximum limit
+    const maxQuantity = 100;
     if (newQuantity >= minQuantity && newQuantity <= maxQuantity) {
       setQuantity(newQuantity);
     } else if (newQuantity < minQuantity) {
@@ -190,7 +202,7 @@ const ProductDetails = () => {
                         name="row-radio-buttons-group"
                         sx={{
                           display: 'flex',
-                          alignItems: 'center', // Vertically align the radio and text in the center
+                          alignItems: 'center',
                         }}
                       >
                         <Radio
@@ -199,18 +211,18 @@ const ProductDetails = () => {
                           checked={selectedColor === color}
                           onChange={() => setselectedColor(color)}
                           sx={{
-                            color: color, // Default (unchecked) color
+                            color: color,
                             '&.Mui-checked': {
-                              color: color, // Checked color
+                              color: color,
                             },
                           }}
                         />
                         <span
                           style={{
-                            color: selectedColor === color ? color : '#000000', // Set text color based on selected state
-                            marginLeft: '8px', // Optional spacing between the radio and text
-                            display: 'inline-flex', // Ensures text stays on the same line as the radio button
-                            alignItems: 'center', // Vertically aligns the text with the radio button
+                            color: selectedColor === color ? color : '#000000',
+                            marginLeft: '8px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
                           }}
                         >
                           {color}
@@ -232,23 +244,20 @@ const ProductDetails = () => {
                         name="row-radio-buttons-group"
                         sx={{
                           display: 'flex',
-                          alignItems: 'center', // Vertically align the radio and text in the center
+                          alignItems: 'center',
                         }}
-                        key={size} // Add key here for each size
+                        key={size}
                       >
                         <Radio
-                          value={size} // Set the size as the value
-                          checked={selectedSize === size} // Check if this size is selected
-                          onChange={() => setselectedSize(size)} // Update the selected size
-                          sx={{
-                            
-                          }}
+                          value={size}
+                          checked={selectedSize === size}
+                          onChange={() => setselectedSize(size)}
                         />
                         <span
                           style={{
-                            marginLeft: '8px', // Spacing between the radio and text
-                            display: 'inline-flex', // Keep text in line with the radio button
-                            alignItems: 'center', // Align text and radio button vertically
+                            marginLeft: '8px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
                           }}
                         >
                           {size}
@@ -308,8 +317,8 @@ const ProductDetails = () => {
             </Paper>
           </Grid>
         </Grid>
+        <RelatedProducts />
       </Box>
-      <RelatedProducts ProductCategory={ProductCategory} />
     </>
   );
 };

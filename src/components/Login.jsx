@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 export default function CustomLoginForm() {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -26,7 +27,7 @@ export default function CustomLoginForm() {
   const handleChange = (prop) => (event) => {
     setFormValues({ ...formValues, [prop]: event.target.value });
   };
-
+  const navigate = useNavigate(); 
   const handleLogin = async (event) => {
     event.preventDefault();
     if (!formValues.email || !formValues.password) {
@@ -46,8 +47,10 @@ export default function CustomLoginForm() {
       });
 
       const response = await axios.post("http://localhost:8000/dj-rest-auth/login/", body, config);
-      console.log("Login successful:", response.data);
+      // console.log("Login successful:", response.data);
+      localStorage.setItem("token", response);
       alert('Login successful!');
+      navigate("/");
       setError(''); // Clear any previous errors
     } catch (err) {
       console.error('Error during login:', err.response?.data || err.message);
