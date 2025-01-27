@@ -9,6 +9,7 @@ import { BaseUrls } from '../env';
 import RadioGroup from '@mui/material/RadioGroup';
 import Radio from '@mui/material/Radio';
 import RelatedProducts from './ReletedProducts';
+import axios from 'axios';
 
 const ProductDetails = () => {
   const { product_id } = useParams();
@@ -46,23 +47,53 @@ const ProductDetails = () => {
     fetchItems();
   }, [ItemsUrls]);
 
-  const handleAddToCart = () => {
-    // Retrieve the user email from localStorage or context
-    const user = JSON.parse(localStorage.getItem('user')); // Replace this with your actual method of retrieving user details
+  const handleAddToCart = async () => {
+    const token = localStorage.getItem("authToken"); // Retrieve the user token
   
-    if (user && user.email) {
-      console.log('User Email:', user.email);
-    } else {
-      console.log('User not logged in or email not found.');
+    if (!token) {
+      console.log("User not logged in or token not found.");
+      alert("Please log in to add items to your cart.");
+      navigate("/login"); // Navigate to the login page
+      return;
     }
   
-    console.log('Item added to cart');
-    console.log('Product ID:', items.product_id);
-    console.log('Quantity:', quantity);
-    console.log('Selected Color:', selectedColor);
-    console.log('Selected Size:', selectedSize);
+    try {
+      // Prepare the data to send to the backend
+      const cartData = {
+        item: items.product_id, // Backend expects 'item' to match the item field
+        quantity: quantity, // The quantity selected by the user
+        item_color_code: selectedColor || "", // Handle missing color
+        item_size: selectedSize || "", // Handle missing size
+      };
+  
+      console.log("Sending to API:", cartData);
+  
+      // Send the POST request
+      const response = await axios.post(
+        "http://localhost:8000/api/cart/", // Match the CartViewSet endpoint
+        cartData,
+        {
+          headers: {
+            Authorization: `Token ${token}`, // Include the user's token for authentication
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      if (response.status === 201) {
+        console.log("Item added to cart successfully:", response.data);
+        alert("Item added to cart successfully!");
+      } else {
+        console.error("Failed to add item to cart:", response.data);
+        alert("Failed to add item to cart.");
+      }
+    } catch (error) {
+      console.error("Error adding item to cart:", error.response?.data || error.message);
+      alert("Failed to add item to cart.");
+    }
   };
   
+    
   const handleBuyNow = () => {
     // Assuming cart addition here
     console.log('Proceeding to checkout...');
@@ -317,7 +348,7 @@ const ProductDetails = () => {
             </Paper>
           </Grid>
         </Grid>
-        <RelatedProducts ProductCategory={ProductCategory}/>
+        <RelatedProducts ProductCategory={ProductCategory} />
       </Box>
     </>
   );

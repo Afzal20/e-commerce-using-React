@@ -28,36 +28,55 @@ export default function CustomLoginForm() {
     setFormValues({ ...formValues, [prop]: event.target.value });
   };
   const navigate = useNavigate(); 
+
+
   const handleLogin = async (event) => {
     event.preventDefault();
+  
+    // Validate input fields
     if (!formValues.email || !formValues.password) {
-      setError('Email and password are required.');
+      setError("Email and password are required.");
       return;
     }
-
+  
     try {
       const config = {
         headers: {
           "Content-Type": "application/json",
         },
       };
+  
+      // Create request body
       const body = JSON.stringify({
         email: formValues.email,
         password: formValues.password,
       });
-
-      const response = await axios.post("http://localhost:8000/dj-rest-auth/login/", body, config);
-      // console.log("Login successful:", response.data);
-      localStorage.setItem("token", JSON.stringify(response.data));
-      alert('Login successful!');
-      setError('');
-      window.location.href = '/';
-      setError(''); // Clear any previous errors
+  
+      // Send login request
+      const response = await axios.post(
+        "http://localhost:8000/dj-rest-auth/login/",
+        body,
+        config
+      );
+  
+      // Store the token only (not the entire response)
+      localStorage.setItem("authToken", response.data.key);
+  
+      // Success message
+      alert("Login successful!");
+  
+      // Clear errors and form fields
+      setError("");
+      setFormValues({ email: "", password: "" }); // Clear form fields
+  
+      // Redirect to the home page (using React Router's useNavigate)
+      navigate("/");
     } catch (err) {
-      console.error('Error during login:', err.response?.data || err.message);
-      setError('Login failed. Please check your credentials.');
+      console.error("Error during login:", err.response?.data || err.message);
+      setError("Login failed. Please check your credentials.");
     }
   };
+  
 
   return (
     <Box

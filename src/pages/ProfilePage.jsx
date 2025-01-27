@@ -8,11 +8,14 @@ const ProfilePage = () => {
 
     if (token) {
       try {
-        const parsedToken = JSON.parse(token); // Parse the JSON string
-        console.log('User Details:', parsedToken.user); // Log user details
-        console.log('Access Token:', parsedToken.access); // Log access token
+        // Ensure the token is valid JSON
+        const parsedToken = JSON.parse(token); 
+        console.log('User Details:', parsedToken?.user || 'No user details'); 
+        console.log('Access Token:', parsedToken?.access || 'No access token'); 
       } catch (error) {
         console.error('Error parsing token:', error);
+        // Optional: Clear the invalid token
+        localStorage.removeItem('token');
       }
     } else {
       console.log('No user is logged in.');
