@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 
@@ -65,7 +66,8 @@ export default function CustomLoginForm() {
       const authToken = response;
 
       // Store the token securely in localStorage
-      localStorage.setItem("authToken", authToken.data);
+      localStorage.setItem("authToken", authToken.data.access);
+      console.log("Token stored:", authToken.data.access);
 
       // Success message
       alert("Login successful!");

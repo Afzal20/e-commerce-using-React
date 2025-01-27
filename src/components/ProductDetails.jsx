@@ -48,52 +48,65 @@ const ProductDetails = () => {
   }, [ItemsUrls]);
 
   const handleAddToCart = async () => {
-    const token = localStorage.getItem("authToken"); // Retrieve the user token
+
+    // Retrieve token from localStorage
+    const token = localStorage.getItem("authToken");
   
     if (!token) {
-      console.log("User not logged in or token not found.");
       alert("Please log in to add items to your cart.");
-      navigate("/login"); // Navigate to the login page
+      navigate("/login");
       return;
     }
   
+    // Validate cart data
+    if (!selectedColor || !selectedSize || !quantity) {
+      alert("Please select color, size, and quantity.");
+      return;
+    }
+  
+    setLoading(true); // Start loading state
     try {
-      // Prepare the data to send to the backend
-      const cartData = {
-        item: items.product_id, // Backend expects 'item' to match the item field
-        quantity: quantity, // The quantity selected by the user
-        item_color_code: selectedColor || "", // Handle missing color
-        item_size: selectedSize || "", // Handle missing size
-      };
-  
-      console.log("Sending to API:", cartData);
-  
-      // Send the POST request
       const response = await axios.post(
-        "http://localhost:8000/api/cart/", // Match the CartViewSet endpoint
-        cartData,
+        "http://localhost:8000/api/cart/add/",
+        {
+          item: items.id,
+          item_color_code: items.item_color.find(
+            (c) => c.color.name === selectedColor
+          )?.color?.code,
+          item_size: selectedSize,
+          quantity: quantity,
+          applied_coupon: null, // Update this if needed
+        },
         {
           headers: {
-            Authorization: `Token ${token}`, // Include the user's token for authentication
-            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         }
       );
   
-      if (response.status === 201) {
-        console.log("Item added to cart successfully:", response.data);
-        alert("Item added to cart successfully!");
-      } else {
-        console.error("Failed to add item to cart:", response.data);
-        alert("Failed to add item to cart.");
-      }
+      // Success
+      console.log("Item successfully added to cart:", response.data);
+      alert("Item added to cart successfully!");
     } catch (error) {
-      console.error("Error adding item to cart:", error.response?.data || error.message);
-      alert("Failed to add item to cart.");
+      if (axios.isAxiosError(error)) {
+        console.error("Axios error:", error.response?.data || error.message);
+        const errorMessage = error.response?.data?.detail || "Failed to add item to the cart.";
+        if (error.response?.status === 401) {
+          alert("Session expired. Please log in again.");
+          localStorage.removeItem("token");
+          navigate("/login");
+        } else {
+          alert(`Error: ${errorMessage}`);
+        }
+      } else {
+        console.error("Error:", error.message);
+        alert(`An error occurred: ${error.message}`);
+      }
+    } finally {
+      setLoading(false); // End loading state
     }
   };
-  
-    
+
   const handleBuyNow = () => {
     // Assuming cart addition here
     console.log('Proceeding to checkout...');
