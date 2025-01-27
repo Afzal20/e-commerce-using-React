@@ -32,52 +32,64 @@ export default function CustomLoginForm() {
 
   const handleLogin = async (event) => {
     event.preventDefault();
-  
+
     // Validate input fields
     if (!formValues.email || !formValues.password) {
       setError("Email and password are required.");
       return;
     }
-  
+
     try {
+      // Set headers
       const config = {
         headers: {
           "Content-Type": "application/json",
         },
       };
-  
+
       // Create request body
-      const body = JSON.stringify({
+      const body = {
+        username: "", 
         email: formValues.email,
         password: formValues.password,
-      });
-  
+      };
+
       // Send login request
       const response = await axios.post(
         "http://localhost:8000/dj-rest-auth/login/",
         body,
         config
       );
-  
-      // Store the token only (not the entire response)
-      localStorage.setItem("authToken", response.data.key);
-  
+
+      // Extract the token from the response
+      const authToken = response;
+
+      // Store the token securely in localStorage
+      localStorage.setItem("authToken", authToken.data);
+
       // Success message
       alert("Login successful!");
-  
+
       // Clear errors and form fields
       setError("");
-      setFormValues({ email: "", password: "" }); // Clear form fields
-  
-      // Redirect to the home page (using React Router's useNavigate)
+      setFormValues({ email: "", password: "" });
+
+      // Redirect to the home page (using React Router's `useNavigate`)
       navigate("/");
     } catch (err) {
       console.error("Error during login:", err.response?.data || err.message);
-      setError("Login failed. Please check your credentials.");
+
+      // Display user-friendly error messages
+      if (err.response?.data?.non_field_errors) {
+        setError(err.response.data.non_field_errors.join(" "));
+      } else if (err.response?.status === 400) {
+        setError("Invalid credentials. Please try again.");
+      } else {
+        setError("Something went wrong. Please try again later.");
+      }
     }
   };
   
-
   return (
     <Box
       sx={{
