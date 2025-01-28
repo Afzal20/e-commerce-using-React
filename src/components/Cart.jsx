@@ -107,9 +107,28 @@ const Cart = () => {
     setCartItems(updatedItems);
   };
 
-  const removeItem = (id) => {
-    const updatedItems = cartItems.filter((item) => item.id !== id);
-    setCartItems(updatedItems);
+  const removeItem = async (id) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:8000/api/cart/remove/${id}/`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to remove item from cart");
+      }
+  
+      // Update UI after successful deletion
+      setCartItems(cartItems.filter((item) => item.id !== id));
+    } catch (error) {
+      console.error("Error removing item:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const calculateSubtotal = () => {
