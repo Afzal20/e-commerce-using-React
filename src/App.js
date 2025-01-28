@@ -13,7 +13,7 @@ import ChangePassword from './pages/ChangePassword';
 import ResetPassword from './pages/ResetPassword';
 
 const isAuthenticated = () => {
-  return localStorage.getItem('token');
+  return localStorage.getItem('authToken');
 };
 
 const App = () => {

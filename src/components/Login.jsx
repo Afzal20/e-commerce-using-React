@@ -67,6 +67,7 @@ export default function CustomLoginForm() {
 
       // Store the token securely in localStorage
       localStorage.setItem("authToken", authToken.data.access);
+      localStorage.setItem("user", JSON.stringify(authToken.data.user));
       console.log("Token stored:", authToken.data.access);
 
       // Success message
