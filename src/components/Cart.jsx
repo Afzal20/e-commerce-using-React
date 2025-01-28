@@ -99,13 +99,39 @@ const Cart = () => {
     }
   }, [cartItems, token]);
 
-  const updateQuantity = (id, newQuantity) => {
+  const updateQuantity = async (id, newQuantity) => {
     if (newQuantity < 1) return;
-    const updatedItems = cartItems.map((item) =>
-      item.id === id ? { ...item, quantity: newQuantity } : item
-    );
-    setCartItems(updatedItems);
+    setLoading(true);
+  
+    try {
+      const response = await fetch(`http://localhost:8000/api/cart/update/${id}/`, {
+        method: "PATCH", // Use PATCH to update only the quantity field
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ quantity: newQuantity }),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to update item quantity");
+      }
+  
+      const updatedItem = await response.json();
+  
+      // Update UI after successful update
+      const updatedItems = cartItems.map((item) =>
+        item.id === id ? { ...item, quantity: updatedItem.quantity } : item
+      );
+      setCartItems(updatedItems);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+  
 
   const removeItem = async (id) => {
     setLoading(true);

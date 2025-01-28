@@ -111,7 +111,7 @@ const ProductDetails = () => {
     // Assuming cart addition here
     console.log('Proceeding to checkout...');
     // navigate to checkout page
-    navigate('/checkout');
+    navigate('/order');
   };
 
   const handleImageClick = (index) => {
