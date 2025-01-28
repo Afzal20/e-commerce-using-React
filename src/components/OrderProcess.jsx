@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Container,
@@ -40,6 +40,84 @@ const OrderProcess = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [formErrors, setFormErrors] = useState({});
   const [orderComplete, setOrderComplete] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
+  const token = localStorage.getItem("authToken");
+  const [hasFetched, setHasFetched] = useState(false); 
+
+  // cart Details
+  useEffect(() => {
+    const fetchCartDetails = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/cart/", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch cart data");
+        }
+
+        const cartData = await response.json();
+        console.log("Cart Items:", cartData);
+        setCartItems(cartData);
+      } catch (error) {
+        console.error("Error fetching cart:", error);
+      }
+    };
+
+    fetchCartDetails();
+  }, [token]);
+
+  // Fetch product details and merge with cart data
+ 
+  useEffect(() => {
+    // If cartItems are empty or already fetched, don't run the effect again
+    if (!cartItems.length || hasFetched) return;
+  
+    const fetchItemDetails = async () => {
+      try {
+        const productPromises = cartItems.map(async (cartItem) => {
+          const response = await fetch(
+            `http://localhost:8000/api/product/${cartItem.item}/`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+  
+          if (!response.ok) {
+            throw new Error(`Failed to fetch product details for item ${cartItem.item}`);
+          }
+  
+          const productData = await response.json();
+  
+          // Merge product details with cart item
+          return {
+            id: productData.product_id,
+            name: productData.title,
+            price: productData.price,
+            quantity: cartItem.quantity,
+            image: productData.image,
+          };
+        });
+  
+        const mergedCart = await Promise.all(productPromises);
+        setHasFetched(true); // Mark as fetched to prevent re-fetching
+        setCartItems(mergedCart); 
+        console.log("Merged Cart Details:", mergedCart);
+      } catch (error) {
+        console.error("Error fetching product details:", error);
+      }
+    };
+  
+    fetchItemDetails();
+  }, [cartItems, token, hasFetched]); // Trigger the effect when cartItems or token change
   
   const [formData, setFormData] = useState({
     firstName: "",
@@ -54,23 +132,6 @@ const OrderProcess = () => {
     transactionId: ""
   });
 
-  const dummyCartItems = [
-    {
-      id: 1,
-      name: "Designer Dress",
-      price: 299.99,
-      quantity: 1,
-      image: "images.unsplash.com/photo-1539008835657-9e8e9680c956"
-    },
-    {
-      id: 2,
-      name: "Premium Shoes",
-      price: 149.99,
-      quantity: 2,
-      image: "images.unsplash.com/photo-1542291026-7eec264c27ff"
-    }
-  ];
-
   const steps = ["Cart Summary", "Shipping Details", "Payment", "Confirmation"];
 
   const handleInputChange = (e) => {
@@ -81,7 +142,7 @@ const OrderProcess = () => {
 
   const validateField = (name, value) => {
     let errors = { ...formErrors };
-    
+
     switch (name) {
       case "email":
         errors.email = !/\S+@\S+\.\S+/.test(value) ? "Invalid email address" : "";
@@ -114,12 +175,12 @@ const OrderProcess = () => {
   };
 
   const calculateTotal = () => {
-    return dummyCartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
   const renderCartSummary = () => (
     <Box>
-      {dummyCartItems.map((item) => (
+      {cartItems.map((item) => (
         <StyledCard key={item.id}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={3}>

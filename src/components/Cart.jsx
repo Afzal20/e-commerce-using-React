@@ -35,7 +35,7 @@ const Cart = () => {
   const [loading, setLoading] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [productDetails, setProductDetails] = useState([]);
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjo0ODkxNTgzMDI0LCJpYXQiOjE3Mzc5ODMwMjQsImp0aSI6ImIzMzU4MjczZDFjZjQ4YzY4OTc3N2ZhMWJjMDg3OTgwIiwidXNlcl9pZCI6Mn0.RN4ONI5MELM_tiHfLj3EiGMjfbqPu2v4TFZXdqoIPow";
+  const token = localStorage.getItem('authToken');
   const navigate = useNavigate();
 
   // Fetch cart details
@@ -165,9 +165,8 @@ const Cart = () => {
   };
 
   const subtotal = calculateSubtotal();
-  const shipping = 9.99;
-  const tax = subtotal * 0.1;
-  const total = subtotal + shipping + tax;
+  const shipping = 80;
+  const total = subtotal + shipping ;
 
   const handleCheckout = () => {
     navigate("/order");
@@ -245,10 +244,6 @@ const Cart = () => {
                 <Box display="flex" justifyContent="space-between" mb={1}>
                   <Typography>Shipping</Typography>
                   <Typography>{shipping.toFixed(2)}/-</Typography>
-                </Box>
-                <Box display="flex" justifyContent="space-between" mb={1}>
-                  <Typography>Tax</Typography>
-                  <Typography>{tax.toFixed(2)}/-</Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between" mt={2}>
                   <Typography variant="h6">Total</Typography>

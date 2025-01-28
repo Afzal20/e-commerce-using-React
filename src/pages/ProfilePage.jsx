@@ -9,8 +9,7 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       // Use the provided access token directly
-      const token =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjo0ODkxNTgzMDI0LCJpYXQiOjE3Mzc5ODMwMjQsImp0aSI6ImIzMzU4MjczZDFjZjQ4YzY4OTc3N2ZhMWJjMDg3OTgwIiwidXNlcl9pZCI6Mn0.RN4ONI5MELM_tiHfLj3EiGMjfbqPu2v4TFZXdqoIPow';
+      const token = localStorage.getItem('authToken');
 
       try {
         // Fetch user details using the access token
