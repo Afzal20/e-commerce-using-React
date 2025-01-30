@@ -5,13 +5,13 @@ const ProductsContext = createContext();
 
 export const ProductsProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null); // Track the selected product for "Buy Now"
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch products only if not already loaded
   useEffect(() => {
     const loadProducts = async () => {
-      if (products.length === 0) { // Check if products are already loaded
+      if (products.length === 0) { 
         setLoading(true);
         try {
           const data = await fetchItems();
@@ -29,7 +29,7 @@ export const ProductsProvider = ({ children }) => {
   }, []);
 
   return (
-    <ProductsContext.Provider value={{ products, loading, error, setProducts }}>
+    <ProductsContext.Provider value={{ products, selectedProduct, setSelectedProduct, loading, error, setProducts }}>
       {children}
     </ProductsContext.Provider>
   );

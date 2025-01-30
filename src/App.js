@@ -5,11 +5,12 @@ import ProfilePage from './pages/ProfilePage';
 import ProductPage from './pages/ProductPage';
 import CartPage from './pages/CartPage';
 import Login from './pages/LoginPage';
-import { ProductsProvider } from './context/ProductsContext'; // Ensure you import ProductsProvider
+import { ProductsProvider } from './context/ProductsContext';
 import RegistrationPage from './pages/RegistrationPage';
 import OrderProcessPage from './pages/OrderProcessPage';
 import ChangePassword from './pages/ChangePassword';
 import ResetPassword from './pages/ResetPassword';
+import ScrollToTop from './components/ScrollToTop';
 
 const isAuthenticated = () => {
   return localStorage.getItem('authToken');
@@ -18,6 +19,7 @@ const isAuthenticated = () => {
 const App = () => {
   return (
     <Router>
+      <ScrollToTop />
       <ProductsProvider>
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -31,8 +33,9 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegistrationPage />} />
           <Route path="/order" element={<OrderProcessPage />} />
-          <Route path="/change/password" element={<ChangePassword />} />
-          <Route path="/reset/password" element={<ResetPassword />} />
+          <Route path="/order/:product_id" element={<OrderProcessPage />} />
+          {/* <Route path="/change/password" element={<ChangePassword />} />
+          <Route path="/reset/password" element={<ResetPassword />} /> */}
         </Routes>
       </ProductsProvider>
     </Router>

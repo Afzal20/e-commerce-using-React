@@ -23,6 +23,9 @@ import {
 import { styled } from "@mui/system";
 import { FaMoneyBillWave } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: "2rem",
@@ -47,13 +50,47 @@ const OrderProcess = () => {
   const token = localStorage.getItem("authToken");
   const [hasFetched, setHasFetched] = useState(false);
   const isPaymentStep = isAuthenticated ? activeStep === 2 : activeStep === 3;
+  const isCreateAccountStep = isAuthenticated ? false : (activeStep === 1);
+
+  
   const [accountData, setAccountData] = useState({
     email: "",
     password: "",
     confirmPassword: "",
   });
   const [error, setError] = useState("");
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [formValues, setFormValues] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  
+  const handleChange = (field) => (event) => {
+    setFormValues({ ...formValues, [field]: event.target.value });
+  };
+  
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+  
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+  
+  const handleLogin = () => {
+    // Implement login logic here
+    console.log("Logging in with", formValues);
+  };
+  
+  const handleSignUp = () => {
+    // Implement sign-up logic here
+    if (formValues.password !== formValues.confirmPassword) {
+      setError("Passwords do not match!");
+      return;
+    }
+    console.log("Signing up with", formValues);
+  };
 
   const handleAccountSubmit = () => {
     if (!accountData.email || !accountData.password) {
@@ -336,110 +373,279 @@ const OrderProcess = () => {
       </Grid>
     </Grid>
   );
-  const renderCreateAccount = () => (
-    <Box>
-      <Typography variant="h6" gutterBottom>
-        If You have an account, please login. Otherwise, create an account. Or you can skip & continue as a guest.
-      </Typography>
+  
+  // const renderCreateAccount = () => (
+  //   <Box>
+  //     <Typography variant="h6" gutterBottom>
+  //       If You have an account, please login. Otherwise, create an account. Or you can skip & continue as a guest.
+  //     </Typography>
 
-      <TextField
-        fullWidth
-        label="Email"
-        name="email"
-        type="email"
-        value={accountData.email}
-        onChange={(e) => setAccountData({ ...accountData, email: e.target.value })}
-        sx={{ mb: 2 }}
-      />
-      <TextField
-        fullWidth
-        label="Password"
-        name="password"
-        type="password"
-        value={accountData.password}
-        onChange={(e) => setAccountData({ ...accountData, password: e.target.value })}
-        sx={{ mb: 2 }}
-      />
-      {!isAuthenticated && (
-        <TextField
+  //     <TextField
+  //       fullWidth
+  //       label="Email"
+  //       name="email"
+  //       type="email"
+  //       value={accountData.email}
+  //       onChange={(e) => setAccountData({ ...accountData, email: e.target.value })}
+  //       sx={{ mb: 2 }}
+  //     />
+  //     <TextField
+  //       fullWidth
+  //       label="Password"
+  //       name="password"
+  //       type="password"
+  //       value={accountData.password}
+  //       onChange={(e) => setAccountData({ ...accountData, password: e.target.value })}
+  //       sx={{ mb: 2 }}
+  //     />
+  //     {!isAuthenticated && (
+  //       <TextField
+  //         fullWidth
+  //         label="Confirm Password"
+  //         name="confirmPassword"
+  //         type="password"
+  //         value={accountData.confirmPassword}
+  //         onChange={(e) => setAccountData({ ...accountData, confirmPassword: e.target.value })}
+  //         sx={{ mb: 2 }}
+  //       />
+  //     )}
+  //     {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
+  //     <Button variant="contained" color="primary" onClick={handleAccountSubmit} fullWidth>
+  //       {isAuthenticated ? "Login" : "Sign Up"}
+  //     </Button>
+
+  //     <Button onClick={() => setIsAuthenticated(!isAuthenticated)} sx={{ mt: 2 }} fullWidth>
+  //       {isAuthenticated ? "Create an Account" : "Already have an account? Login"}
+  //     </Button>
+
+  //     <Button
+  //       variant="outlined"
+  //       color="secondary"
+  //       onClick={() => setActiveStep((prev) => prev + 1)}
+  //       fullWidth
+  //       sx={{ mt: 2 }}
+  //     >
+  //       Skip & Continue as Guest
+  //     </Button>
+  //   </Box>
+  // );
+
+  const [loginButtonClicked, setloginButtonClicked] = useState(false);
+
+  const renderCreateAccount = () => (
+    <Box sx={{ maxWidth: 400, mx: "auto", mt: 4, p: 4, bgcolor: "white", borderRadius: 2, boxShadow: 3, textAlign: "center" }}>
+      <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
+        {loginButtonClicked ? "Welcome Back!" : "Welcome To Bindu-Britto!"}
+      </Typography>
+      <Typography variant="body1" sx={{ color: "text.secondary", mb: 3 }}>
+        {loginButtonClicked ? "Log in to your account" : "Register Now"}
+      </Typography>
+      
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
+      
+      {loginButtonClicked && (
+        <Button
+          variant="outlined"
           fullWidth
+          startIcon={<img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google icon" width="20" />}
+          sx={{ mb: 2, textTransform: "none", color: "text.primary", borderColor: "grey.400" }}
+        >
+          Log in with Google
+        </Button>
+      )}
+      
+      {loginButtonClicked && <Divider sx={{ my: 2 }}>or</Divider>}
+      
+      <TextField
+        label="Email Address"
+        variant="outlined"
+        fullWidth
+        value={formValues.email}
+        onChange={handleChange("email")}
+        sx={{ mb: 2 }}
+      />
+      
+      <TextField
+        label="Password"
+        variant="outlined"
+        fullWidth
+        type={showPassword ? "text" : "password"}
+        value={formValues.password}
+        onChange={handleChange("password")}
+        sx={{ mb: 2 }}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                onClick={handleClickShowPassword}
+                onMouseDown={handleMouseDownPassword}
+                edge="end"
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+      
+      {!loginButtonClicked && (
+        <TextField
           label="Confirm Password"
-          name="confirmPassword"
-          type="password"
-          value={accountData.confirmPassword}
-          onChange={(e) => setAccountData({ ...accountData, confirmPassword: e.target.value })}
-          sx={{ mb: 2 }}
+          variant="outlined"
+          fullWidth
+          type={showPassword ? "text" : "password"}
+          value={formValues.confirmPassword}
+          onChange={handleChange("confirmPassword")}
+          sx={{ mb: 3 }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
       )}
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-
-      <Button variant="contained" color="primary" onClick={handleAccountSubmit} fullWidth>
-        {isAuthenticated ? "Login" : "Sign Up"}
-      </Button>
-
-      <Button onClick={() => setIsAuthenticated(!isAuthenticated)} sx={{ mt: 2 }} fullWidth>
-        {isAuthenticated ? "Create an Account" : "Already have an account? Login"}
-      </Button>
-
+      
       <Button
-        variant="outlined"
-        color="secondary"
-        onClick={() => setActiveStep((prev) => prev + 1)}
+        variant="contained"
         fullWidth
-        sx={{ mt: 2 }}
+        color="primary"
+        sx={{ mb: 2, fontWeight: "bold", textTransform: "none" }}
+        onClick={loginButtonClicked ? handleLogin : handleSignUp}
       >
-        Skip & Continue as Guest
+        {loginButtonClicked ? "Log In" : "Sign Up"}
       </Button>
+
+      
+      <Button
+  variant="text"
+  onClick={() => setloginButtonClicked(!loginButtonClicked)}
+  sx={{ color: "#1976d2", textTransform: "none", mt: 1 }}
+>
+  {loginButtonClicked ? "Don't have an account? Sign up" : "Already have an account? Sign in."}
+</Button>
+
     </Box>
   );
 
-  const renderPaymentSection = () => (
-    <Box>
-      <Typography variant="h6" gutterBottom>Payment Method</Typography>
-      <RadioGroup
-        name="paymentMethod"
-        value={formData.paymentMethod}
-        onChange={handleInputChange}
-      >
-        <FormControlLabel
-          value="bkash"
-          control={<Radio />}
-          label={<Box sx={{ display: "flex", alignItems: "center" }}>
-            <FaMoneyBillWave size={24} style={{ marginRight: "8px" }} />
-            bKash
-          </Box>}
-        />
-        <FormControlLabel
-          value="nagad"
-          control={<Radio />}
-          label={<Box sx={{ display: "flex", alignItems: "center" }}>
-            <FaMoneyBillWave size={24} style={{ marginRight: "8px" }} />
-            Nagad
-          </Box>}
-        />
-        <FormControlLabel
-          value="dutch-bangla"
-          control={<Radio />}
-          label={<Box sx={{ display: "flex", alignItems: "center" }}>
-            <FaMoneyBillWave size={24} style={{ marginRight: "8px" }} />
-            Dutch-Bangla Bank
-          </Box>}
-        />
-      </RadioGroup>
-      <Box sx={{ mt: 2 }}>
-        <TextField
-          fullWidth
-          label="Transaction ID"
-          name="transactionId"
-          value={formData.transactionId}
-          onChange={handleInputChange}
-          error={!!formErrors.transactionId}
-          helperText={formErrors.transactionId}
-          required
-        />
+  const renderPaymentSection = () => {
+    const paymentInstructions = {
+      bkash: {
+        steps: [
+          "Go to your bKash app or Dial *247#",
+          "Choose ‘Send Money’",
+          "Enter below bKash Account Number",
+          "Enter total amount",
+          "Now enter your bKash Account PIN to confirm the transaction",
+          "Copy Transaction ID from payment confirmation message and paste below"
+        ],
+        accountType: "Personal",
+        accountNumber: "017********"
+      },
+      rocket: {
+        steps: [
+          "Go to your Rocket app or Dial *322#",
+          "Choose ‘Send Money’",
+          "Enter below Rocket Account Number",
+          "Enter total amount",
+          "Now enter your Rocket Account PIN to confirm the transaction",
+          "Copy Transaction ID from payment confirmation message and paste below"
+        ],
+        accountType: "Personal",
+        accountNumber: "017********"
+      },
+      nagad: {
+        steps: [
+          "Go to your Nagad app or Dial *167#",
+          "Choose ‘Send Money’",
+          "Enter below Nagad Account Number",
+          "Enter total amount",
+          "Now enter your Nagad Account PIN to confirm the transaction",
+          "Copy Transaction ID from payment confirmation message and paste below"
+        ],
+        accountType: "Personal",
+        accountNumber: "017********"
+      },
+      upay: {
+        steps: [
+          "Go to your Upay app or Dial *268#",
+          "Choose ‘Send Money’",
+          "Enter below Upay Account Number",
+          "Enter total amount",
+          "Now enter your Upay Account PIN to confirm the transaction",
+          "Copy Transaction ID from payment confirmation message and paste below"
+        ],
+        accountType: "Personal",
+        accountNumber: "017********"
+      }
+    };
+  
+    const selectedPayment = formData.paymentMethod;
+    const instructions = paymentInstructions[selectedPayment];
+  
+    return (
+      <Box>
+        <Typography variant="h6" gutterBottom>Payment Method</Typography>
+        <RadioGroup name="paymentMethod" value={selectedPayment} onChange={handleInputChange}>
+          {Object.keys(paymentInstructions).map((method) => (
+            <FormControlLabel
+              key={method}
+              value={method}
+              control={<Radio />}
+              label={<Box sx={{ display: "flex", alignItems: "center" }}>
+                <FaMoneyBillWave size={24} style={{ marginRight: "8px" }} />
+                {method.charAt(0).toUpperCase() + method.slice(1)}
+              </Box>}
+            />
+          ))}
+        </RadioGroup>
+        {instructions && (
+          <Box sx={{ mt: 2, p: 2, border: "1px solid #ddd", borderRadius: "8px" }}>
+            <Typography variant="subtitle1">Instructions for {selectedPayment.toUpperCase()}</Typography>
+            <ul>
+              {instructions.steps.map((step, index) => (
+                <li key={index}>{step}</li>
+              ))}
+            </ul>
+            <Typography variant="body1">You need to send: ${calculateTotal().toFixed(2)} BDT</Typography>
+            <Typography variant="body1">Account Type: {instructions.accountType}</Typography>
+            <Typography variant="body1">Account Number: {instructions.accountNumber}</Typography>
+            <TextField
+              fullWidth
+              label="Your Account Number"
+              name="senderAccountNumber"
+              value={formData.senderAccountNumber}
+              onChange={handleInputChange}
+              required
+              sx={{ mt: 2 }}
+            />
+            <TextField
+              fullWidth
+              label="Transaction ID"
+              name="transactionId"
+              value={formData.transactionId}
+              onChange={handleInputChange}
+              required
+              sx={{ mt: 2 }}
+            />
+          </Box>
+        )}
       </Box>
-    </Box>
-  );
+    );
+  };
+  
 
   const renderConfirmation = () => (
     <Box>
@@ -485,6 +691,8 @@ const OrderProcess = () => {
   
     return steps[step] ? steps[step]() : "Unknown step";
   };
+
+  console.log("acctive Step:", activeStep);
   
 
   return (
@@ -511,7 +719,7 @@ const OrderProcess = () => {
               color="primary"
               disabled={activeStep === 2 && !formData.transactionId}
             >
-              {isPaymentStep ? "Confirm" : "Next"}
+              {isPaymentStep ? "Confirm" : isCreateAccountStep ? "Skip" : "Next"}
             </Button>
           )}
         </Box>
