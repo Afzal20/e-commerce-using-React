@@ -51,21 +51,22 @@ const ProductDetails = () => {
 
     // Retrieve token from localStorage
     const token = localStorage.getItem("authToken");
-  
+
     if (!token) {
       alert("Please log in to add items to your cart.");
       navigate("/login");
       return;
     }
-  
+
     // Validate cart data
     if (!selectedColor || !selectedSize || !quantity) {
       alert("Please select color, size, and quantity.");
       return;
     }
-  
+
     setLoading(true); // Start loading state
     try {
+      // add to cart on server side
       const response = await axios.post(
         "http://localhost:8000/api/cart/add/",
         {
@@ -83,7 +84,7 @@ const ProductDetails = () => {
           },
         }
       );
-  
+
       // Success
       console.log("Item successfully added to cart:", response.data);
       alert("Item added to cart successfully!");
@@ -108,11 +109,29 @@ const ProductDetails = () => {
   };
 
   const handleBuyNow = () => {
-    // Assuming cart addition here
-    console.log('Proceeding to checkout...');
-    // navigate to checkout page
-    navigate('/order');
+    // Ensure color, size, and quantity are selected
+    if (!selectedColor || !selectedSize || !quantity) {
+      alert("Please select color, size, and quantity.");
+      return;
+    }
+
+    console.log("Items Details:", items);
+    console.log("Quantity:", quantity);
+    console.log("Size:", selectedSize);
+    console.log("Color:", selectedColor);
+
+    // Store the selected product details in local storage
+    localStorage.setItem(
+      "buyNowProducts",
+      JSON.stringify({
+        item: items,
+        quantity: quantity,
+        size: selectedSize,
+        color: selectedColor,
+      })
+    );
   };
+
 
   const handleImageClick = (index) => {
     if (items.images && items.images[index]) {

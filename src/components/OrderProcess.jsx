@@ -22,6 +22,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { FaMoneyBillWave } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: "2rem",
@@ -37,12 +38,39 @@ const StyledCard = styled(Card)(({ theme }) => ({
 }));
 
 const OrderProcess = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [formErrors, setFormErrors] = useState({});
   const [orderComplete, setOrderComplete] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const token = localStorage.getItem("authToken");
-  const [hasFetched, setHasFetched] = useState(false); 
+  const [hasFetched, setHasFetched] = useState(false);
+  const isPaymentStep = isAuthenticated ? activeStep === 2 : activeStep === 3;
+  const [accountData, setAccountData] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [error, setError] = useState("");
+
+
+  const handleAccountSubmit = () => {
+    if (!accountData.email || !accountData.password) {
+      setError("Email and Password are required.");
+      return;
+    }
+
+    if (!isAuthenticated && accountData.password !== accountData.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    // Simulate authentication
+    localStorage.setItem("authToken");
+    setIsAuthenticated(true);
+    setActiveStep((prev) => prev + 1); // Move to next step
+  };
 
   // cart Details
   useEffect(() => {
@@ -71,12 +99,18 @@ const OrderProcess = () => {
     fetchCartDetails();
   }, [token]);
 
+  useEffect(() => {
+    if (token) {
+      setIsAuthenticated(true);
+      // Skip "Create Account" Step
+    }
+  }, [token]);
+
   // Fetch product details and merge with cart data
- 
   useEffect(() => {
     // If cartItems are empty or already fetched, don't run the effect again
     if (!cartItems.length || hasFetched) return;
-  
+
     const fetchItemDetails = async () => {
       try {
         const productPromises = cartItems.map(async (cartItem) => {
@@ -90,13 +124,13 @@ const OrderProcess = () => {
               },
             }
           );
-  
+
           if (!response.ok) {
             throw new Error(`Failed to fetch product details for item ${cartItem.item}`);
           }
-  
+
           const productData = await response.json();
-  
+
           // Merge product details with cart item
           return {
             id: productData.product_id,
@@ -106,19 +140,19 @@ const OrderProcess = () => {
             image: productData.image,
           };
         });
-  
+
         const mergedCart = await Promise.all(productPromises);
         setHasFetched(true); // Mark as fetched to prevent re-fetching
-        setCartItems(mergedCart); 
+        setCartItems(mergedCart);
         console.log("Merged Cart Details:", mergedCart);
       } catch (error) {
         console.error("Error fetching product details:", error);
       }
     };
-  
+
     fetchItemDetails();
   }, [cartItems, token, hasFetched]); // Trigger the effect when cartItems or token change
-  
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -132,7 +166,10 @@ const OrderProcess = () => {
     transactionId: ""
   });
 
-  const steps = ["Cart Summary", "Shipping Details", "Payment", "Confirmation"];
+  const steps = isAuthenticated
+    ? ["Cart Summary", "Shipping Details", "Payment", "Confirmation"]
+    : ["Cart Summary", "Create Account", "Shipping Details", "Payment", "Confirmation"];
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -174,9 +211,19 @@ const OrderProcess = () => {
     setActiveStep((prev) => prev - 1);
   };
 
-  const calculateTotal = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const handleBackClick = () => {
+    if (activeStep === steps.length - 1) {
+      navigate("/"); // Redirect to home when on the last step
+    } else {
+      handleBack(); // Otherwise, go back to the previous step
+    }
   };
+  const calculateTotal = () => {
+    const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+    const deliveryCharge = 80;
+    return subtotal + deliveryCharge;
+  };
+  
 
   const renderCartSummary = () => (
     <Box>
@@ -289,6 +336,62 @@ const OrderProcess = () => {
       </Grid>
     </Grid>
   );
+  const renderCreateAccount = () => (
+    <Box>
+      <Typography variant="h6" gutterBottom>
+        If You have an account, please login. Otherwise, create an account. Or you can skip & continue as a guest.
+      </Typography>
+
+      <TextField
+        fullWidth
+        label="Email"
+        name="email"
+        type="email"
+        value={accountData.email}
+        onChange={(e) => setAccountData({ ...accountData, email: e.target.value })}
+        sx={{ mb: 2 }}
+      />
+      <TextField
+        fullWidth
+        label="Password"
+        name="password"
+        type="password"
+        value={accountData.password}
+        onChange={(e) => setAccountData({ ...accountData, password: e.target.value })}
+        sx={{ mb: 2 }}
+      />
+      {!isAuthenticated && (
+        <TextField
+          fullWidth
+          label="Confirm Password"
+          name="confirmPassword"
+          type="password"
+          value={accountData.confirmPassword}
+          onChange={(e) => setAccountData({ ...accountData, confirmPassword: e.target.value })}
+          sx={{ mb: 2 }}
+        />
+      )}
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
+      <Button variant="contained" color="primary" onClick={handleAccountSubmit} fullWidth>
+        {isAuthenticated ? "Login" : "Sign Up"}
+      </Button>
+
+      <Button onClick={() => setIsAuthenticated(!isAuthenticated)} sx={{ mt: 2 }} fullWidth>
+        {isAuthenticated ? "Create an Account" : "Already have an account? Login"}
+      </Button>
+
+      <Button
+        variant="outlined"
+        color="secondary"
+        onClick={() => setActiveStep((prev) => prev + 1)}
+        fullWidth
+        sx={{ mt: 2 }}
+      >
+        Skip & Continue as Guest
+      </Button>
+    </Box>
+  );
 
   const renderPaymentSection = () => (
     <Box>
@@ -375,21 +478,14 @@ const OrderProcess = () => {
       </Paper>
     </Box>
   );
-
   const getStepContent = (step) => {
-    switch (step) {
-      case 0:
-        return renderCartSummary();
-      case 1:
-        return renderShippingForm();
-      case 2:
-        return renderPaymentSection();
-      case 3:
-        return renderConfirmation();
-      default:
-        return "Unknown step";
-    }
+    const steps = isAuthenticated
+      ? [renderCartSummary, renderShippingForm, renderPaymentSection, renderConfirmation]
+      : [renderCartSummary, renderCreateAccount, renderShippingForm, renderPaymentSection, renderConfirmation];
+  
+    return steps[step] ? steps[step]() : "Unknown step";
   };
+  
 
   return (
     <StyledContainer maxWidth="md">
@@ -404,12 +500,8 @@ const OrderProcess = () => {
         {getStepContent(activeStep)}
         <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
           {activeStep !== 0 && (
-            <Button
-              onClick={handleBack}
-              sx={{ mr: 1 }}
-              variant="outlined"
-            >
-              Back
+            <Button onClick={handleBackClick} sx={{ mr: 1 }} variant="outlined">
+              {activeStep === steps.length - 1 ? "Back to Home" : "Back"}
             </Button>
           )}
           {activeStep < steps.length - 1 && (
@@ -419,7 +511,7 @@ const OrderProcess = () => {
               color="primary"
               disabled={activeStep === 2 && !formData.transactionId}
             >
-              Next
+              {isPaymentStep ? "Confirm" : "Next"}
             </Button>
           )}
         </Box>
