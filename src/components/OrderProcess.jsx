@@ -322,19 +322,55 @@ const OrderProcess = () => {
           required
         />
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          label="Email"
-          name="email"
-          type="email"
-          value={formData.email}
+          label="Phone Number"
+          name="Phone"
+          value={formData.Phone}
           onChange={handleInputChange}
-          error={!!formErrors.email}
-          helperText={formErrors.email}
+          error={!!formErrors.Phone}
+          helperText={formErrors.Phone}
           required
         />
       </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label="District"
+          name="District"
+          value={formData.District}
+          onChange={handleInputChange}
+          error={!!formErrors.District}
+          helperText={formErrors.District}
+          required
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label="Upozila"
+          name="Upozila"
+          value={formData.Upozila}
+          onChange={handleInputChange}
+          error={!!formErrors.Upozila}
+          helperText={formErrors.Upozila}
+          required
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label="City"
+          name="City"
+          value={formData.City}
+          onChange={handleInputChange}
+          error={!!formErrors.City}
+          helperText={formErrors.City}
+          required
+        />
+      </Grid>
+      
       <Grid item xs={12}>
         <TextField
           fullWidth
@@ -344,30 +380,6 @@ const OrderProcess = () => {
           onChange={handleInputChange}
           error={!!formErrors.address}
           helperText={formErrors.address}
-          required
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          label="City"
-          name="city"
-          value={formData.city}
-          onChange={handleInputChange}
-          error={!!formErrors.city}
-          helperText={formErrors.city}
-          required
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          label="Postal Code"
-          name="postalCode"
-          value={formData.postalCode}
-          onChange={handleInputChange}
-          error={!!formErrors.postalCode}
-          helperText={formErrors.postalCode}
           required
         />
       </Grid>
@@ -391,7 +403,7 @@ const OrderProcess = () => {
         </Typography>
       )}
       
-      {loginButtonClicked && (
+      {/* {loginButtonClicked && (
         <Button
           variant="outlined"
           fullWidth
@@ -402,7 +414,7 @@ const OrderProcess = () => {
         </Button>
       )}
       
-      {loginButtonClicked && <Divider sx={{ my: 2 }}>or</Divider>}
+      {loginButtonClicked && <Divider sx={{ my: 2 }}>or</Divider>} */}
       
       <TextField
         label="Email Address"

@@ -1,13 +1,11 @@
 import { Grid, Box } from '@mui/material';
 import React from 'react';
 import FeatureList from '../components/FeatureList';
-import Navbar from '../components/Navbar';
 import CustomRegistrationForm from '../components/RegistrationFrom';
 
 const RegistrationPage = () => {
   return (
     <>
-      <Navbar />
       <Grid
         container
         spacing={2}

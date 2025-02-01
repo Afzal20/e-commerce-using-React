@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -119,7 +118,7 @@ export default function CustomLoginForm() {
         </Typography>
       )}
 
-      <Button
+      {/* <Button
         variant="outlined"
         fullWidth
         startIcon={<img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google icon" width="20" />}
@@ -131,9 +130,9 @@ export default function CustomLoginForm() {
         }}
       >
         Log in with Google
-      </Button>
+      </Button> */}
 
-      <Divider sx={{ my: 2 }}>or</Divider>
+      {/* <Divider sx={{ my: 2 }}>or</Divider> */}
 
       <TextField
         label="Email address"

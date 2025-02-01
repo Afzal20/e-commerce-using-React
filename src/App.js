@@ -13,6 +13,7 @@ import ChangePassword from './pages/ChangePassword';
 import ResetPassword from './pages/ResetPassword';
 import ScrollToTop from './components/ScrollToTop';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
 const isAuthenticated = () => {
   return localStorage.getItem('authToken');
@@ -40,6 +41,7 @@ const App = () => {
           {/* <Route path="/change/password" element={<ChangePassword />} />
           <Route path="/reset/password" element={<ResetPassword />} /> */}
         </Routes>
+        <Footer/>
       </ProductsProvider>
     </Router>
   );

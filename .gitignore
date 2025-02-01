@@ -11,6 +11,8 @@
 
 # production
 /build
+/Products
+*.jpg
 
 # misc
 .DS_Store

@@ -38,7 +38,6 @@ const ProfilePage = () => {
 
   return (
     <>
-      <Navbar />
       <div style={{ padding: '20px', textAlign: 'center' }}>
         <h1>Profile Page</h1>
         {error ? (
