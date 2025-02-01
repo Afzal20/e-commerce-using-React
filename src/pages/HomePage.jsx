@@ -1,6 +1,5 @@
 import React, {useState} from "react";
 import AllProducts from "../components/Allproducts";
-import NavbarWithDrawer from "../components/Navbar";
 import PersistentDrawerLeft from "../components/Drawer";
 import { Button, Box } from '@mui/material'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -23,7 +22,6 @@ const ProductPage = () => {
 
   return (
     <div>
-      <NavbarWithDrawer/>
       <Box display="flex" justifyContent="space-between" p={2}>
         <Button 
         sx={{

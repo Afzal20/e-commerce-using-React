@@ -7,7 +7,6 @@ import Navbar from '../components/Navbar'
 const LoginPage = () => {
   return (
     <>
-    <Navbar/>
       <div>
         <Grid container spacing={2} sx={{ padding: { xs: 2, sm: 4 } }}>
           <Grid item xs={12} sm={6}>

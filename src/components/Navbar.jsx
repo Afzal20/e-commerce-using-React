@@ -62,6 +62,37 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function Navbar() {
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+    const token = localStorage.getItem('authToken');
+    const [cartItems, setCartItems] = React.useState([]);
+
+    const [totalCartItems, setTotalCartItems] = React.useState(0);
+    
+    React.useEffect(() => {
+        const fetchCartItems = async () => {
+          try {
+            const response = await fetch("http://localhost:8000/api/cart/", {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            });
+    
+            if (!response.ok) {
+              throw new Error("Failed to fetch cart data");
+            }
+    
+            const data = await response.json();
+            setCartItems(data.items || []); // Assuming API returns { items: [...] }
+            setTotalCartItems(data.length || 0);
+            console.log("Cart Data:", data.length);
+          } catch (error) {
+            console.error("Error fetching cart items:", error);
+          }
+        };
+    
+        fetchCartItems();
+      }, [token]);
 
     const handleMobileMenuClose = () => {
         setMobileMoreAnchorEl(null);
@@ -98,7 +129,7 @@ export default function Navbar() {
             </MenuItem>
             <MenuItem component={Link} to="/cart">
                 <IconButton size="large" aria-label="cart" color="inherit" sx={{ color: "#E7C400" }}>
-                    <Badge badgeContent={17} color="error">
+                    <Badge badgeContent={totalCartItems} color="error">
                         <ShoppingCartIcon sx={{ color: "#E7C400" }} />
                     </Badge>
                 </IconButton>
@@ -137,7 +168,7 @@ export default function Navbar() {
                             </Badge>
                         </IconButton>
                         <IconButton size="large" aria-label="cart" color="inherit" component={Link} to="/cart" sx={{ color: "#E7C400" }}>
-                            <Badge badgeContent={17} color="error">
+                            <Badge badgeContent={totalCartItems} color="error">
                                 <ShoppingCartIcon sx={{ color: "#E7C400" }} />
                             </Badge>
                         </IconButton>

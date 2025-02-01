@@ -147,6 +147,7 @@ const Cart = () => {
       if (!response.ok) {
         throw new Error("Failed to remove item from cart");
       }
+      window.location.reload();
   
       // Update UI after successful deletion
       setCartItems(cartItems.filter((item) => item.id !== id));
@@ -204,7 +205,7 @@ const Cart = () => {
                     </IconButton>
                   </Box>
                   <Typography color="text.secondary" sx={{ mb: 2 }}>
-                    {product?.price?.toFixed(2) || "0.00"}/-
+                    {product?.price?.toFixed(2) || "N/A"}/-
                   </Typography>
                   <Box display="flex" alignItems="center" gap={1}>
                     <QuantityButton
@@ -221,9 +222,17 @@ const Cart = () => {
                       <FiPlus />
                     </QuantityButton>
                   </Box>
-                  <Typography sx={{ mt: 2 }}>
-                    Subtotal: {product ? (product.price * item.quantity).toFixed(2) : "0.00"}/-
-                  </Typography>
+                  <Box display="flex" alignItems="center" mt={1}>
+                    <Typography variant="body2" color="text.secondary">
+                      Color: {item.item_color_code}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+                      Size: {item.item_size}
+                    </Typography>
+                  </Box>
+                    <Typography sx={{ mt: 2 }}>
+                      Subtotal: {product ? (product.price * item.quantity).toFixed(2) : "0.00"}/-
+                    </Typography>
                 </CardContent>
               </StyledCard>
             );

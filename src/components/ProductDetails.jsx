@@ -10,6 +10,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import Radio from '@mui/material/Radio';
 import RelatedProducts from './ReletedProducts';
 import axios from 'axios';
+import { useProducts } from '../context/ProductsContext';
 
 const ProductDetails = () => {
   const { product_id } = useParams();
@@ -21,7 +22,8 @@ const ProductDetails = () => {
   const [ProductCategory, setProductCategory] = useState('');
   const [selectedColor, setselectedColor] = useState('');
   const [selectedSize, setselectedSize] = useState('');
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
+  const { setProducts } = useProducts();
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -73,7 +75,7 @@ const ProductDetails = () => {
           item: items.id,
           item_color_code: items.item_color.find(
             (c) => c.color.name === selectedColor
-          )?.color?.code,
+          )?.color?.name,
           item_size: selectedSize,
           quantity: quantity,
           applied_coupon: null, // Update this if needed
@@ -87,7 +89,7 @@ const ProductDetails = () => {
 
       // Success
       console.log("Item successfully added to cart:", response.data);
-      alert("Item added to cart successfully!");
+      window.location.reload(); 
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("Axios error:", error.response?.data || error.message);
@@ -114,6 +116,17 @@ const ProductDetails = () => {
       alert("Please select color, size, and quantity.");
       return;
     }
+
+    const selectedItem = {
+      item: items.product_id,
+      quantity: quantity,
+      size: selectedSize,
+      color: selectedColor,
+    };
+
+    // Store the selected product details in provider
+    setProducts(selectedItem);
+    navigate(`/order/${items.product_id}`);
 
     console.log("Items Details:", items);
     console.log("Quantity:", quantity);
@@ -215,9 +228,9 @@ const ProductDetails = () => {
             <Paper sx={{ padding: 3, backgroundColor: '#f9f9f9' }}>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
-                  <Typography variant="h6" sx={{ color: '#000000' }}>
-                    Home / REGULAR COLLECTION / {productData.title}
-                  </Typography>
+                  {/* <Typography variant="h6" sx={{ color: '#000000' }}>
+                    {productData.title}
+                  </Typography> */}
                   <Typography
                     variant="h4"
                     sx={{ marginTop: 2, fontWeight: 'bold', color: '#000000' }}

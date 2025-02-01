@@ -373,63 +373,6 @@ const OrderProcess = () => {
       </Grid>
     </Grid>
   );
-  
-  // const renderCreateAccount = () => (
-  //   <Box>
-  //     <Typography variant="h6" gutterBottom>
-  //       If You have an account, please login. Otherwise, create an account. Or you can skip & continue as a guest.
-  //     </Typography>
-
-  //     <TextField
-  //       fullWidth
-  //       label="Email"
-  //       name="email"
-  //       type="email"
-  //       value={accountData.email}
-  //       onChange={(e) => setAccountData({ ...accountData, email: e.target.value })}
-  //       sx={{ mb: 2 }}
-  //     />
-  //     <TextField
-  //       fullWidth
-  //       label="Password"
-  //       name="password"
-  //       type="password"
-  //       value={accountData.password}
-  //       onChange={(e) => setAccountData({ ...accountData, password: e.target.value })}
-  //       sx={{ mb: 2 }}
-  //     />
-  //     {!isAuthenticated && (
-  //       <TextField
-  //         fullWidth
-  //         label="Confirm Password"
-  //         name="confirmPassword"
-  //         type="password"
-  //         value={accountData.confirmPassword}
-  //         onChange={(e) => setAccountData({ ...accountData, confirmPassword: e.target.value })}
-  //         sx={{ mb: 2 }}
-  //       />
-  //     )}
-  //     {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-
-  //     <Button variant="contained" color="primary" onClick={handleAccountSubmit} fullWidth>
-  //       {isAuthenticated ? "Login" : "Sign Up"}
-  //     </Button>
-
-  //     <Button onClick={() => setIsAuthenticated(!isAuthenticated)} sx={{ mt: 2 }} fullWidth>
-  //       {isAuthenticated ? "Create an Account" : "Already have an account? Login"}
-  //     </Button>
-
-  //     <Button
-  //       variant="outlined"
-  //       color="secondary"
-  //       onClick={() => setActiveStep((prev) => prev + 1)}
-  //       fullWidth
-  //       sx={{ mt: 2 }}
-  //     >
-  //       Skip & Continue as Guest
-  //     </Button>
-  //   </Box>
-  // );
 
   const [loginButtonClicked, setloginButtonClicked] = useState(false);
 

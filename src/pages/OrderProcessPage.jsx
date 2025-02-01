@@ -5,7 +5,6 @@ import OrderProcess from '../components/OrderProcess'
 const OrderProcessPage = () => {
   return (
     <>
-    <Navbar/>
     <OrderProcess/>
     </>
   )
