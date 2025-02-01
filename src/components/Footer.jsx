@@ -5,6 +5,7 @@ import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import PhoneIcon from "@mui/icons-material/Phone";
 import logo from "../assets/img/logo-2-300x124.png";
 import qrCodee from "../assets/img/transparent-2-qr-1024x1024.png";
+import { BaseUrls } from "../env";
 
 const Footer = () => {
   const [email, setEmail] = React.useState("");
@@ -20,7 +21,7 @@ const Footer = () => {
     };
   
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/contact/", {
+      const response = await fetch(`${BaseUrls}/api/contact/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

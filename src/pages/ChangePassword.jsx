@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import axios from 'axios';
+import { BaseUrls } from '../env';
 
 const ChangePassword = () => {
   const [oldPassword, setOldPassword] = useState('');
@@ -44,7 +45,7 @@ const ChangePassword = () => {
         new_password2: confirmNewPassword,
       };
 
-      await axios.post('http://localhost:8000/dj-rest-auth/password/change/', body, config);
+      await axios.post(`${BaseUrls}/dj-rest-auth/password/change/`, body, config);
 
       setSuccessMessage('Password changed successfully');
       setErrorMessage('');

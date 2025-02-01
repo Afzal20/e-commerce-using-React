@@ -5,7 +5,7 @@ import { BaseUrls } from '../env';
 
 const fetchItems = async () => {
   try {
-    const response = await fetch(`${BaseUrls}items/`);
+    const response = await fetch(`${BaseUrls}/api/items/`);
     if (!response.ok) {
       throw new Error('Failed to fetch');
     }

@@ -26,6 +26,7 @@ import { useNavigate } from 'react-router-dom';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { BaseUrls } from "../env";
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: "2rem",
@@ -109,11 +110,33 @@ const OrderProcess = () => {
     setActiveStep((prev) => prev + 1); // Move to next step
   };
 
+  const handleconfirm = () => {
+    const api_data  = {
+
+      ProductID: "", 
+      Quantity: "",
+      Price: "",
+      Color: "",
+      Size: "",
+      TotalPrice: "",
+
+      firstName: "",
+      lastName: "",
+      phoneNumber: "",
+      District: "",
+      Upozila: "",
+      city: "",
+      address: "",
+
+      paymentMethod: "",
+      transactionId: ""
+    } 
+  }
   // cart Details
   useEffect(() => {
     const fetchCartDetails = async () => {
       try {
-        const response = await fetch("http://localhost:8000/api/cart/", {
+        const response = await fetch(`${BaseUrls}/api/cart/`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -152,7 +175,7 @@ const OrderProcess = () => {
       try {
         const productPromises = cartItems.map(async (cartItem) => {
           const response = await fetch(
-            `http://localhost:8000/api/product/${cartItem.item}/`,
+            `${BaseUrls}/api/product/${cartItem.item}/`,
             {
               method: "GET",
               headers: {
@@ -191,15 +214,22 @@ const OrderProcess = () => {
   }, [cartItems, token, hasFetched]); // Trigger the effect when cartItems or token change
 
   const [formData, setFormData] = useState({
+    ProductID: "", 
+    Quantity: "",
+    Price: "",
+    Color: "",
+    Size: "",
+    TotalPrice: "",
+
     firstName: "",
     lastName: "",
-    email: "",
-    address: "",
+    phoneNumber: "",
+    District: "",
+    Upozila: "",
     city: "",
-    postalCode: "",
-    country: "",
-    phone: "",
-    paymentMethod: "bkash",
+    address: "",
+
+    paymentMethod: "",
     transactionId: ""
   });
 
@@ -212,6 +242,8 @@ const OrderProcess = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     validateField(name, value);
+    console.log("Form Data:", formData);
+
   };
 
   const validateField = (name, value) => {
@@ -308,6 +340,7 @@ const OrderProcess = () => {
           error={!!formErrors.firstName}
           helperText={formErrors.firstName}
           required
+
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -361,7 +394,7 @@ const OrderProcess = () => {
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          label="City"
+          label="City/Town"
           name="City"
           value={formData.City}
           onChange={handleInputChange}
@@ -402,20 +435,7 @@ const OrderProcess = () => {
           {error}
         </Typography>
       )}
-      
-      {/* {loginButtonClicked && (
-        <Button
-          variant="outlined"
-          fullWidth
-          startIcon={<img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google icon" width="20" />}
-          sx={{ mb: 2, textTransform: "none", color: "text.primary", borderColor: "grey.400" }}
-        >
-          Log in with Google
-        </Button>
-      )}
-      
-      {loginButtonClicked && <Divider sx={{ my: 2 }}>or</Divider>} */}
-      
+  
       <TextField
         label="Email Address"
         variant="outlined"

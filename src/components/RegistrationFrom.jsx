@@ -7,6 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import axios from 'axios';
+import { BaseUrls } from '../env';
 
 export default function CustomRegistrationForm() {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -29,7 +30,7 @@ export default function CustomRegistrationForm() {
   const handleSignUp = async (event) => {
     event.preventDefault();
     try {
-      await axios.post('http://localhost:8000/dj-rest-auth/registration/', {
+      await axios.post(`${BaseUrls}/dj-rest-auth/registration/`, {
         email: formValues.email,
         password1: formValues.password,
         password2: formValues.confirmPassword,

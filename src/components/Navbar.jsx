@@ -8,6 +8,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import PersonIcon from '@mui/icons-material/AccountCircle';
 import logo from "../assets/img/logo-2-300x124.png";
+import { BaseUrls } from '../env';
 
 const Search = styled('div')(({ theme }) => ({
     color: "#E7C400",
@@ -63,14 +64,13 @@ export default function Navbar() {
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
     const token = localStorage.getItem('authToken');
-    const [cartItems, setCartItems] = React.useState([]);
 
     const [totalCartItems, setTotalCartItems] = React.useState(0);
     
     React.useEffect(() => {
         const fetchCartItems = async () => {
           try {
-            const response = await fetch("http://localhost:8000/api/cart/", {
+            const response = await fetch(`${BaseUrls}/api/cart/`, {
               method: "GET",
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -83,7 +83,6 @@ export default function Navbar() {
             }
     
             const data = await response.json();
-            setCartItems(data.items || []); // Assuming API returns { items: [...] }
             setTotalCartItems(data.length || 0);
             console.log("Cart Data:", data.length);
           } catch (error) {

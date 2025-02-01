@@ -14,7 +14,7 @@ import { useProducts } from '../context/ProductsContext';
 
 const ProductDetails = () => {
   const { product_id } = useParams();
-  const ItemsUrls = `${BaseUrls}items/${product_id}/`;
+  const ItemsUrls = `${BaseUrls}/api/items/${product_id}/`;
   const [items, setItems] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -70,7 +70,7 @@ const ProductDetails = () => {
     try {
       // add to cart on server side
       const response = await axios.post(
-        "http://localhost:8000/api/cart/add/",
+        `${BaseUrls}/api/cart/add/`,
         {
           item: items.id,
           item_color_code: items.item_color.find(

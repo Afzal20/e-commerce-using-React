@@ -9,6 +9,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import { BaseUrls } from '../env';
 
 export default function CustomLoginForm() {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -56,7 +57,7 @@ export default function CustomLoginForm() {
 
       // Send login request
       const response = await axios.post(
-        "http://localhost:8000/dj-rest-auth/login/",
+        `${BaseUrls}/dj-rest-auth/login/`,
         body,
         config
       );

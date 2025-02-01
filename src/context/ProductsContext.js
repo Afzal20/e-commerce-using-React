@@ -12,7 +12,7 @@ export const ProductsProvider = ({ children }) => {
   useEffect(() => {
     const loadProducts = async () => {
       if (products.length === 0) { 
-        setLoading(true);
+        // setLoading(true);
         try {
           const data = await fetchItems();
           setProducts(data);
@@ -26,7 +26,7 @@ export const ProductsProvider = ({ children }) => {
     };
 
     loadProducts();
-  }, []);
+  }, [products]);
 
   return (
     <ProductsContext.Provider value={{ products, selectedProduct, setSelectedProduct, loading, error, setProducts }}>

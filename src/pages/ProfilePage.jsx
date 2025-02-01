@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Navbar from '../components/Navbar';
+import { BaseUrls } from '../env';
 
 const ProfilePage = () => {
   const [userDetails, setUserDetails] = useState(null);
@@ -13,7 +13,7 @@ const ProfilePage = () => {
 
       try {
         // Fetch user details using the access token
-        const response = await axios.get('http://localhost:8000/dj-rest-auth/user/', {
+        const response = await axios.get(`${BaseUrls}/dj-rest-auth/user/`, {
           headers: {
             Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
           },

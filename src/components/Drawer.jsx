@@ -11,7 +11,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { useTheme } from '@mui/material/styles';
+import { BaseUrls } from '../env';
 
 const drawerWidth = 240;
 
@@ -23,7 +23,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }));
 
 const PersistentDrawerLeft = ({ open, handleDrawerClose, onCategorySelect }) => {
-  const theme = useTheme();
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
 
@@ -31,7 +30,7 @@ const PersistentDrawerLeft = ({ open, handleDrawerClose, onCategorySelect }) => 
     // Fetch categories from the API
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/categories/');
+        const response = await fetch(`${BaseUrls}/api/categories/`);
         if (response.ok) {
           const data = await response.json();
           setCategories(data);
