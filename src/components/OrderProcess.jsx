@@ -168,51 +168,71 @@ const OrderProcess = () => {
 
   // Fetch product details and merge with cart data
   useEffect(() => {
-    // If cartItems are empty or already fetched, don't run the effect again
     if (!cartItems.length || hasFetched) return;
-
+  
     const fetchItemDetails = async () => {
       try {
         const productPromises = cartItems.map(async (cartItem) => {
-          const response = await fetch(
-            `${BaseUrls}/api/product/${cartItem.item}/`,
-            {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-
+          const response = await fetch(`${BaseUrls}/api/product/${cartItem.item}/`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+  
           if (!response.ok) {
             throw new Error(`Failed to fetch product details for item ${cartItem.item}`);
           }
-
+  
           const productData = await response.json();
-
-          // Merge product details with cart item
+  
           return {
             id: productData.product_id,
             name: productData.title,
             price: productData.price,
             quantity: cartItem.quantity,
+            Product_color: cartItem.item_color_code,
             image: productData.image,
+            size: cartItem.item_size,
           };
         });
-
+  
         const mergedCart = await Promise.all(productPromises);
-        setHasFetched(true); // Mark as fetched to prevent re-fetching
+        setHasFetched(true);
         setCartItems(mergedCart);
+  
         console.log("Merged Cart Details:", mergedCart);
+  
+        if (mergedCart.length > 0) {
+          const firstItem = mergedCart[0]; // Assign the first item in cart
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            ProductID: firstItem.id,
+            Quantity: firstItem.quantity,
+            Price: firstItem.price,
+            Color: firstItem.Product_color,
+            Size: firstItem.size,
+            TotalPrice: firstItem.price * firstItem.quantity, // Calculate total price
+            firstName: "",
+            lastName: "",
+            phoneNumber: "",
+            District: "",
+            Upozila: "",
+            city: "",
+            address: "",
+            paymentMethod: "",
+            transactionId: "",
+          }));
+        }
       } catch (error) {
         console.error("Error fetching product details:", error);
       }
     };
-
+  
     fetchItemDetails();
-  }, [cartItems, token, hasFetched]); // Trigger the effect when cartItems or token change
-
+  }, [cartItems, token, hasFetched]);
+  
   const [formData, setFormData] = useState({
     ProductID: "", 
     Quantity: "",
@@ -314,8 +334,11 @@ const OrderProcess = () => {
                 <Typography variant="body1" color="text.secondary">
                   Quantity: {item.quantity}
                 </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  Color : {item.Product_color}
+                </Typography>
                 <Typography variant="h6" color="primary">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  Price : ${(item.price * item.quantity).toFixed(2)}
                 </Typography>
               </CardContent>
             </Grid>

@@ -2,7 +2,6 @@ import { Grid, Box } from '@mui/material';
 import React from 'react'
 import Login from '../components/Login'
 import FeatureList from '../components/FeatureList'
-import Navbar from '../components/Navbar'
 
 const LoginPage = () => {
   return (

@@ -26,7 +26,7 @@ export const ProductsProvider = ({ children }) => {
     };
 
     loadProducts();
-  }, [products]);
+  }, []);
 
   return (
     <ProductsContext.Provider value={{ products, selectedProduct, setSelectedProduct, loading, error, setProducts }}>

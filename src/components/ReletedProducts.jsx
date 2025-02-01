@@ -5,7 +5,7 @@ import { BaseUrls } from '../env';
 
 const fetchItems = async () => {
   try {
-    const response = await fetch(`${BaseUrls}/api/items/`);
+    const response = await fetch(`${BaseUrls}api/items/`);
     if (!response.ok) {
       throw new Error('Failed to fetch');
     }
@@ -39,7 +39,7 @@ const RelatedProducts = ({ ProductCategory }) => {
       }
     };
     fetchData();
-  }, [ProductCategory]);
+  }, []);
   
   const retryFetch = () => {
     setLoading(true);

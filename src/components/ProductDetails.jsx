@@ -47,7 +47,7 @@ const ProductDetails = () => {
       }
     };
     fetchItems();
-  }, [ItemsUrls]);
+  }, []); 
 
   const handleAddToCart = async () => {
 
@@ -70,7 +70,7 @@ const ProductDetails = () => {
     try {
       // add to cart on server side
       const response = await axios.post(
-        `${BaseUrls}/api/cart/add/`,
+        `${BaseUrls}api/cart/add/`,
         {
           item: items.id,
           item_color_code: items.item_color.find(
