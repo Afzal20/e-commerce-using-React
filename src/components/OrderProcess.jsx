@@ -50,10 +50,11 @@ const OrderProcess = () => {
   const [cartItems, setCartItems] = useState([]);
   const token = localStorage.getItem("authToken");
   const [hasFetched, setHasFetched] = useState(false);
+
   const isPaymentStep = isAuthenticated ? activeStep === 2 : activeStep === 3;
   const isCreateAccountStep = isAuthenticated ? false : (activeStep === 1);
 
-  
+
   const [accountData, setAccountData] = useState({
     email: "",
     password: "",
@@ -66,24 +67,28 @@ const OrderProcess = () => {
     password: "",
     confirmPassword: "",
   });
-  
+
   const handleChange = (field) => (event) => {
     setFormValues({ ...formValues, [field]: event.target.value });
   };
-  
+
+  // Call the function when needed
+  // submitOrder();
+
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
-  
+
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-  
+
   const handleLogin = () => {
     // Implement login logic here
     console.log("Logging in with", formValues);
   };
-  
+
   const handleSignUp = () => {
     // Implement sign-up logic here
     if (formValues.password !== formValues.confirmPassword) {
@@ -111,9 +116,9 @@ const OrderProcess = () => {
   };
 
   const handleconfirm = () => {
-    const api_data  = {
+    const api_data = {
 
-      ProductID: "", 
+      ProductID: "",
       Quantity: "",
       Price: "",
       Color: "",
@@ -122,15 +127,15 @@ const OrderProcess = () => {
 
       firstName: "",
       lastName: "",
-      phoneNumber: "",
       District: "",
       Upozila: "",
       city: "",
       address: "",
 
+      Transaction_phoneNumber: "",
       paymentMethod: "",
       transactionId: ""
-    } 
+    }
   }
   // cart Details
   useEffect(() => {
@@ -169,7 +174,7 @@ const OrderProcess = () => {
   // Fetch product details and merge with cart data
   useEffect(() => {
     if (!cartItems.length || hasFetched) return;
-  
+
     const fetchItemDetails = async () => {
       try {
         const productPromises = cartItems.map(async (cartItem) => {
@@ -180,13 +185,13 @@ const OrderProcess = () => {
               "Content-Type": "application/json",
             },
           });
-  
+
           if (!response.ok) {
             throw new Error(`Failed to fetch product details for item ${cartItem.item}`);
           }
-  
+
           const productData = await response.json();
-  
+
           return {
             id: productData.product_id,
             name: productData.title,
@@ -197,13 +202,13 @@ const OrderProcess = () => {
             size: cartItem.item_size,
           };
         });
-  
+
         const mergedCart = await Promise.all(productPromises);
         setHasFetched(true);
         setCartItems(mergedCart);
-  
+
         console.log("Merged Cart Details:", mergedCart);
-  
+
         if (mergedCart.length > 0) {
           const firstItem = mergedCart[0]; // Assign the first item in cart
           setFormData((prevFormData) => ({
@@ -213,10 +218,10 @@ const OrderProcess = () => {
             Price: firstItem.price,
             Color: firstItem.Product_color,
             Size: firstItem.size,
-            TotalPrice: firstItem.price * firstItem.quantity, // Calculate total price
+            TotalPrice: (firstItem.price * firstItem.quantity) + 80, // Calculate total price
+
             firstName: "",
             lastName: "",
-            phoneNumber: "",
             District: "",
             Upozila: "",
             city: "",
@@ -229,12 +234,70 @@ const OrderProcess = () => {
         console.error("Error fetching product details:", error);
       }
     };
-  
+
     fetchItemDetails();
   }, [cartItems, token, hasFetched]);
-  
+
+  async function submitOrder() {
+    const authToken = localStorage.getItem('authToken');
+    const user = authToken ? getUserFromToken(authToken) : null;
+
+    const orderData = {
+        product_id: formData.ProductID,
+        quantity: formData.Quantity,
+        price: formData.Price,
+        color: formData.Color,
+        size: formData.Size,
+        total_price: formData.TotalPrice,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        phone_number: formData.Phone,
+        district: formData.District,
+        upozila: formData.Upozila,
+        city: formData.city,
+        address: formData.address,
+        payment_method: formData.paymentMethod,
+        phone_number_pament: formData.senderAccountNumber,
+        transaction_id: formData.transactionId,
+        user: user ? user.id : null
+    };
+
+    try {
+        const response = await fetch("http://localhost:8000/api/orders/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(authToken && { Authorization: `Bearer ${authToken}` })
+            },
+            body: JSON.stringify(orderData)
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to submit order");
+        }
+
+        const result = await response.json();
+        console.log("Order submitted successfully:", result);
+        handleNext(); // Move to the next step
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Failed to submit order. Please try again.");
+    }
+}
+  // Function to decode JWT and extract user info
+  function getUserFromToken(token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1])); // Decode JWT payload
+      return payload.user_id || payload.username || null; // Adjust based on your token structure
+    } catch (error) {
+      console.error("Invalid token:", error);
+      return null;
+    }
+  }
+
+
   const [formData, setFormData] = useState({
-    ProductID: "", 
+    ProductID: "",
     Quantity: "",
     Price: "",
     Color: "",
@@ -243,7 +306,6 @@ const OrderProcess = () => {
 
     firstName: "",
     lastName: "",
-    phoneNumber: "",
     District: "",
     Upozila: "",
     city: "",
@@ -260,11 +322,16 @@ const OrderProcess = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    validateField(name, value);
-    console.log("Form Data:", formData);
 
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+
+    validateField(name, value); // Keep validation
+    console.log("Form Data:", { ...formData, [name]: value });
   };
+
 
   const validateField = (name, value) => {
     let errors = { ...formErrors };
@@ -312,7 +379,7 @@ const OrderProcess = () => {
     const deliveryCharge = 80;
     return subtotal + deliveryCharge;
   };
-  
+
 
   const renderCartSummary = () => (
     <Box>
@@ -358,8 +425,8 @@ const OrderProcess = () => {
           fullWidth
           label="First Name"
           name="firstName"
-          value={formData.firstName}
           onChange={handleInputChange}
+          value={formData.firstName}
           error={!!formErrors.firstName}
           helperText={formErrors.firstName}
           required
@@ -418,15 +485,15 @@ const OrderProcess = () => {
         <TextField
           fullWidth
           label="City/Town"
-          name="City"
-          value={formData.City}
+          name="city"
+          value={formData.city}
           onChange={handleInputChange}
-          error={!!formErrors.City}
-          helperText={formErrors.City}
+          error={!!formErrors.city}
+          helperText={formErrors.city}
           required
         />
       </Grid>
-      
+
       <Grid item xs={12}>
         <TextField
           fullWidth
@@ -452,13 +519,13 @@ const OrderProcess = () => {
       <Typography variant="body1" sx={{ color: "text.secondary", mb: 3 }}>
         {loginButtonClicked ? "Log in to your account" : "Register Now"}
       </Typography>
-      
+
       {error && (
         <Typography color="error" sx={{ mb: 2 }}>
           {error}
         </Typography>
       )}
-  
+
       <TextField
         label="Email Address"
         variant="outlined"
@@ -467,7 +534,7 @@ const OrderProcess = () => {
         onChange={handleChange("email")}
         sx={{ mb: 2 }}
       />
-      
+
       <TextField
         label="Password"
         variant="outlined"
@@ -490,7 +557,7 @@ const OrderProcess = () => {
           ),
         }}
       />
-      
+
       {!loginButtonClicked && (
         <TextField
           label="Confirm Password"
@@ -515,7 +582,7 @@ const OrderProcess = () => {
           }}
         />
       )}
-      
+
       <Button
         variant="contained"
         fullWidth
@@ -526,14 +593,14 @@ const OrderProcess = () => {
         {loginButtonClicked ? "Log In" : "Sign Up"}
       </Button>
 
-      
+
       <Button
-  variant="text"
-  onClick={() => setloginButtonClicked(!loginButtonClicked)}
-  sx={{ color: "#1976d2", textTransform: "none", mt: 1 }}
->
-  {loginButtonClicked ? "Don't have an account? Sign up" : "Already have an account? Sign in."}
-</Button>
+        variant="text"
+        onClick={() => setloginButtonClicked(!loginButtonClicked)}
+        sx={{ color: "#1976d2", textTransform: "none", mt: 1 }}
+      >
+        {loginButtonClicked ? "Don't have an account? Sign up" : "Already have an account? Sign in."}
+      </Button>
 
     </Box>
   );
@@ -589,10 +656,10 @@ const OrderProcess = () => {
         accountNumber: "017********"
       }
     };
-  
+
     const selectedPayment = formData.paymentMethod;
     const instructions = paymentInstructions[selectedPayment];
-  
+
     return (
       <Box>
         <Typography variant="h6" gutterBottom>Payment Method</Typography>
@@ -617,15 +684,15 @@ const OrderProcess = () => {
                 <li key={index}>{step}</li>
               ))}
             </ul>
-            <Typography variant="body1">You need to send: ${calculateTotal().toFixed(2)} BDT</Typography>
+            <Typography variant="body1">You need to send: ${calculateTotal().toFixed(2)} /-</Typography>
             <Typography variant="body1">Account Type: {instructions.accountType}</Typography>
             <Typography variant="body1">Account Number: {instructions.accountNumber}</Typography>
             <TextField
               fullWidth
               label="Your Account Number"
               name="senderAccountNumber"
-              value={formData.senderAccountNumber}
               onChange={handleInputChange}
+              value={formData.senderAccountNumber}
               required
               sx={{ mt: 2 }}
             />
@@ -633,8 +700,8 @@ const OrderProcess = () => {
               fullWidth
               label="Transaction ID"
               name="transactionId"
-              value={formData.transactionId}
               onChange={handleInputChange}
+              value={formData.transactionId}
               required
               sx={{ mt: 2 }}
             />
@@ -643,7 +710,7 @@ const OrderProcess = () => {
       </Box>
     );
   };
-  
+
 
   const renderConfirmation = () => (
     <Box>
@@ -661,7 +728,7 @@ const OrderProcess = () => {
             <Typography color="text.secondary">
               {formData.firstName} {formData.lastName}<br />
               {formData.address}<br />
-              {formData.city}, {formData.postalCode}
+              {formData.city}, <br />
             </Typography>
           </Grid>
           <Grid item xs={12}>
@@ -686,12 +753,12 @@ const OrderProcess = () => {
     const steps = isAuthenticated
       ? [renderCartSummary, renderShippingForm, renderPaymentSection, renderConfirmation]
       : [renderCartSummary, renderCreateAccount, renderShippingForm, renderPaymentSection, renderConfirmation];
-  
+
     return steps[step] ? steps[step]() : "Unknown step";
   };
 
   console.log("acctive Step:", activeStep);
-  
+
 
   return (
     <StyledContainer maxWidth="md">
@@ -713,7 +780,9 @@ const OrderProcess = () => {
           {activeStep < steps.length - 1 && (
             <Button
               variant="contained"
-              onClick={handleNext}
+              onClick={
+                isPaymentStep ? submitOrder : handleNext
+              }
               color="primary"
               disabled={activeStep === 2 && !formData.transactionId}
             >

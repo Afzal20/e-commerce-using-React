@@ -52,6 +52,10 @@ const OrderProcess = () => {
     const [orderComplete, setOrderComplete] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const token = localStorage.getItem("authToken");
+    const isPaymentStep = isAuthenticated ? activeStep === 2 : activeStep === 3;
+    const isCreateAccountStep = isAuthenticated ? false : (activeStep === 1);
+    const [formErrors, setFormErrors] = useState({});
+
     const [formValues, setFormValues] = useState({
         email: "",
         password: "",
@@ -149,6 +153,7 @@ const OrderProcess = () => {
 
     const [loginButtonClicked, setloginButtonClicked] = useState(false);
 
+
     const renderCreateAccount = () => (
         <Box sx={{ maxWidth: 400, mx: "auto", mt: 4, p: 4, bgcolor: "white", borderRadius: 2, boxShadow: 3, textAlign: "center" }}>
             <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
@@ -163,19 +168,6 @@ const OrderProcess = () => {
                     {error}
                 </Typography>
             )}
-
-            {loginButtonClicked && (
-                <Button
-                    variant="outlined"
-                    fullWidth
-                    startIcon={<img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google icon" width="20" />}
-                    sx={{ mb: 2, textTransform: "none", color: "text.primary", borderColor: "grey.400" }}
-                >
-                    Log in with Google
-                </Button>
-            )}
-
-            {loginButtonClicked && <Divider sx={{ my: 2 }}>or</Divider>}
 
             <TextField
                 label="Email Address"
@@ -256,6 +248,7 @@ const OrderProcess = () => {
         </Box>
     );
 
+
     const renderCartSummary = () => (
         <Box>
             {loading ? (
@@ -296,51 +289,97 @@ const OrderProcess = () => {
         </Box>
     );
 
-    const renderShippingForm = () => (
-        <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-                <TextField
-                    fullWidth
-                    label="First Name"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    required
-                />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-                <TextField
-                    fullWidth
-                    label="Last Name"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    required
-                />
-            </Grid>
-            <Grid item xs={12}>
-                <TextField
-                    fullWidth
-                    label="Email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                />
-            </Grid>
-            <Grid item xs={12}>
-                <TextField
-                    fullWidth
-                    label="Address"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    required
-                />
-            </Grid>
-        </Grid>
-    );
+  const renderShippingForm = () => (
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label="First Name"
+          name="firstName"
+          onChange={handleInputChange}
+          value={formData.firstName}
+          error={!!formErrors.firstName}
+          helperText={formErrors.firstName}
+          required
+
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label="Last Name"
+          name="lastName"
+          value={formData.lastName}
+          onChange={handleInputChange}
+          error={!!formErrors.lastName}
+          helperText={formErrors.lastName}
+          required
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label="Phone Number"
+          name="Phone"
+          value={formData.Phone}
+          onChange={handleInputChange}
+          error={!!formErrors.Phone}
+          helperText={formErrors.Phone}
+          required
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label="District"
+          name="District"
+          value={formData.District}
+          onChange={handleInputChange}
+          error={!!formErrors.District}
+          helperText={formErrors.District}
+          required
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label="Upozila"
+          name="Upozila"
+          value={formData.Upozila}
+          onChange={handleInputChange}
+          error={!!formErrors.Upozila}
+          helperText={formErrors.Upozila}
+          required
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label="City/Town"
+          name="city"
+          value={formData.city}
+          onChange={handleInputChange}
+          error={!!formErrors.city}
+          helperText={formErrors.city}
+          required
+        />
+      </Grid>
+      
+      <Grid item xs={12}>
+        <TextField
+          fullWidth
+          label="Address"
+          name="address"
+          value={formData.address}
+          onChange={handleInputChange}
+          error={!!formErrors.address}
+          helperText={formErrors.address}
+          required
+        />
+      </Grid>
+    </Grid>
+  );
+
 
     const renderPaymentSection = () => (
         <Box>
@@ -407,7 +446,7 @@ const OrderProcess = () => {
                             return null;
                     }
                 })()}
-    
+
                 <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
                     {activeStep !== 0 && (
                         <Button onClick={handleBack} sx={{ mr: 1 }} variant="outlined">
@@ -416,13 +455,14 @@ const OrderProcess = () => {
                     )}
                     {activeStep < steps.length - 1 && (
                         <Button variant="contained" onClick={handleNext} color="primary">
-                            Next
+                            {isPaymentStep ? "Confirm" : isCreateAccountStep ? "Skip" : "Next"}
+
                         </Button>
                     )}
                 </Box>
             </Paper>
         </StyledContainer>
-    );    
+    );
 };
 
 export default OrderProcess;
