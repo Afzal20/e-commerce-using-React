@@ -583,9 +583,7 @@ const OrderProcess = () => {
           {activeStep < steps.length - 1 && (
             <Button
               variant="contained"
-              onClick={
-                isPaymentStep ? submitOrder : handleNext
-              }
+              onClick={isPaymentStep ? () => { handleNext(); submitOrder(); } : handleNext}
               color="primary"
               disabled={activeStep === 2 && !formData.transactionId}
             >
