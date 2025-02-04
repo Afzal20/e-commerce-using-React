@@ -9,7 +9,7 @@ const ResetPassword = () => {
     };
 
     const handleResetPassword = () => {
-        // Handle reset password logic here
+        
         console.log('Reset password for:', email);
     };
 

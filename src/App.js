@@ -14,6 +14,7 @@ import ResetPassword from './pages/ResetPassword';
 import ScrollToTop from './components/ScrollToTop';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ResetPasswordConfirm from './pages/ResetPasswordConfirm';
 
 const isAuthenticated = () => {
   return localStorage.getItem('authToken');
@@ -24,6 +25,7 @@ const App = () => {
     <Router>
       <ScrollToTop />
       <ProductsProvider>
+        <useNavigation>
         <Navbar />
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -37,14 +39,17 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegistrationPage />} />
           <Route path="/order" element={<OrderProcessPage />} />
-          <Route path="/order/:product_id" element={<DirectOrderPage/>} />
-          {/* <Route path="/change/password" element={<ChangePassword />} />
-          <Route path="/reset/password" element={<ResetPassword />} /> */}
+          <Route path="/order/:product_id/:color/:quantity/:size" element={<DirectOrderPage />} />
+          <Route path="change/password/" Component={ChangePassword}></Route>
+          <Route path="reset/password/" Component={ResetPassword}></Route>
+          <Route path="reset/password/confirm/:uid/:token" Component={ResetPasswordConfirm}></Route>
         </Routes>
         <Footer/>
+        </useNavigation>
       </ProductsProvider>
     </Router>
   );
 };
 
 export default App;
+

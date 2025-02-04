@@ -44,17 +44,17 @@ const StyledCard = styled(Card)({
 
 
 const OrderProcess = () => {
-    const { product_id } = useParams();
+    const { product_id, color, quantity, size } = useParams();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [activeStep, setActiveStep] = useState(0);
+    const [activeStep, setActiveStep] = useState(0);  
     const [orderComplete, setOrderComplete] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const token = localStorage.getItem("authToken");
     const isPaymentStep = isAuthenticated ? activeStep === 2 : activeStep === 3;
     const isCreateAccountStep = isAuthenticated ? false : (activeStep === 1);
-    const [formErrors, setFormErrors] = useState({});
+    const [formErrors] = useState({});
 
     const [formValues, setFormValues] = useState({
         email: "",
@@ -64,18 +64,19 @@ const OrderProcess = () => {
     const [showPassword, setShowPassword] = useState(false);
 
 
-    const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
-        email: "",
-        address: "",
-        city: "",
-        postalCode: "",
-        country: "",
-        phone: "",
-        paymentMethod: "bkash",
-        transactionId: "",
-    });
+  const [formData, setFormData] = useState({
+    products: [],
+    firstName: "",
+    lastName: "",
+    Phone: "",
+    District: "",
+    Upozila: "",
+    city: "",
+    address: "",
+    paymentMethod: "",
+    senderAccountNumber: "",
+    transactionId: "",
+  });
 
     const handleChange = (field) => (event) => {
         setFormValues({ ...formValues, [field]: event.target.value });
@@ -87,6 +88,7 @@ const OrderProcess = () => {
             try {
                 const response = await axios.get(`${BaseUrls}api/items/${product_id}/`);
                 setProduct(response.data);
+                console.log("Product fetched:", response.data);
             } catch (err) {
                 setError("Failed to load product");
                 console.error("Error fetching product:", err);
@@ -105,6 +107,67 @@ const OrderProcess = () => {
         }
     }, [token]);
 
+      // Function to decode JWT and extract user info
+  function getUserFromToken(token) {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
+      return { id: payload.user_id || null, username: payload.username || null }; // Adjust based on backend token structure
+    } catch (error) {
+      console.error("Invalid token:", error);
+      return null;
+    }
+  }
+
+  async function submitOrder() {
+    const authToken = localStorage.getItem("authToken");
+    const user = authToken ? getUserFromToken(authToken) : null;
+
+    const orderData = {
+        user: user ? user.id : null,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        phone_number: formData.Phone,
+        district: formData.District,
+        upozila: formData.Upozila,
+        city: formData.city,
+        address: formData.address,
+        payment_method: formData.paymentMethod,
+        phone_number_payment: formData.senderAccountNumber,
+        transaction_id: formData.transactionId,
+        order_items: [
+            {
+                product: product_id,
+                quantity: quantity,
+                price: product.price,
+                color: color,
+                size: size,
+            },
+        ],
+    };
+
+    try {
+        const response = await fetch("http://localhost:8000/api/orders/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(authToken && { Authorization: `Bearer ${authToken}` }),
+            },
+            body: JSON.stringify(orderData),
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to submit order.");
+        }
+
+        const responseData = await response.json();
+        console.log("Order submitted successfully:", responseData);
+        setOrderComplete(true); // Mark order as complete
+    } catch (error) {
+        console.error("Error:", error);
+        setError("Failed to submit order. Please try again.");
+    }
+}
+
     const steps = isAuthenticated
         ? ["Cart Summary", "Shipping Details", "Payment", "Confirmation"]
         : ["Cart Summary", "Create Account", "Shipping Details", "Payment", "Confirmation"];
@@ -112,6 +175,7 @@ const OrderProcess = () => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
+        console.log("formData: ", formData);
     };
 
     const handleNext = () => {
@@ -130,7 +194,7 @@ const OrderProcess = () => {
     };
 
     const calculateTotal = () => {
-        return product ? product.price + 80 : 0;
+        return ((product?.price || 0) * quantity) + 80;
     };
 
     const handleMouseDownPassword = (event) => {
@@ -270,11 +334,17 @@ const OrderProcess = () => {
                         <Grid item xs={12} sm={9}>
                             <CardContent>
                                 <Typography variant="h6">{product.title}</Typography>
-                                <Typography variant="body1" color="text.secondary">
-                                    Quantity: 1
-                                </Typography>
                                 <Typography variant="h6" color="primary">
-                                    {product.price} Taka
+                                    Price : {product.price} Taka
+                                </Typography>
+                                <Typography variant="body1" color="text.secondary">
+                                    Quantity: {quantity}
+                                </Typography>
+                                <Typography variant="body2">
+                                    Color : {color}
+                                </Typography>
+                                <Typography variant="body2">
+                                    Size : {size}
                                 </Typography>
                             </CardContent>
                         </Grid>
@@ -289,116 +359,203 @@ const OrderProcess = () => {
         </Box>
     );
 
-  const renderShippingForm = () => (
-    <Grid container spacing={2}>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          label="First Name"
-          name="firstName"
-          onChange={handleInputChange}
-          value={formData.firstName}
-          error={!!formErrors.firstName}
-          helperText={formErrors.firstName}
-          required
+    const renderShippingForm = () => (
+        <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+                <TextField
+                    fullWidth
+                    label="First Name"
+                    name="firstName"
+                    onChange={handleInputChange}
+                    value={formData.firstName}
+                    error={!!formErrors.firstName}
+                    helperText={formErrors.firstName}
+                    required
 
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          label="Last Name"
-          name="lastName"
-          value={formData.lastName}
-          onChange={handleInputChange}
-          error={!!formErrors.lastName}
-          helperText={formErrors.lastName}
-          required
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          label="Phone Number"
-          name="Phone"
-          value={formData.Phone}
-          onChange={handleInputChange}
-          error={!!formErrors.Phone}
-          helperText={formErrors.Phone}
-          required
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          label="District"
-          name="District"
-          value={formData.District}
-          onChange={handleInputChange}
-          error={!!formErrors.District}
-          helperText={formErrors.District}
-          required
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          label="Upozila"
-          name="Upozila"
-          value={formData.Upozila}
-          onChange={handleInputChange}
-          error={!!formErrors.Upozila}
-          helperText={formErrors.Upozila}
-          required
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          label="City/Town"
-          name="city"
-          value={formData.city}
-          onChange={handleInputChange}
-          error={!!formErrors.city}
-          helperText={formErrors.city}
-          required
-        />
-      </Grid>
-      
-      <Grid item xs={12}>
-        <TextField
-          fullWidth
-          label="Address"
-          name="address"
-          value={formData.address}
-          onChange={handleInputChange}
-          error={!!formErrors.address}
-          helperText={formErrors.address}
-          required
-        />
-      </Grid>
-    </Grid>
-  );
+                />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+                <TextField
+                    fullWidth
+                    label="Last Name"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    error={!!formErrors.lastName}
+                    helperText={formErrors.lastName}
+                    required
+                />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+                <TextField
+                    fullWidth
+                    label="Phone Number"
+                    name="Phone"
+                    value={formData.Phone}
+                    onChange={handleInputChange}
+                    error={!!formErrors.Phone}
+                    helperText={formErrors.Phone}
+                    required
+                />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+                <TextField
+                    fullWidth
+                    label="District"
+                    name="District"
+                    value={formData.District}
+                    onChange={handleInputChange}
+                    error={!!formErrors.District}
+                    helperText={formErrors.District}
+                    required
+                />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+                <TextField
+                    fullWidth
+                    label="Upozila"
+                    name="Upozila"
+                    value={formData.Upozila}
+                    onChange={handleInputChange}
+                    error={!!formErrors.Upozila}
+                    helperText={formErrors.Upozila}
+                    required
+                />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+                <TextField
+                    fullWidth
+                    label="City/Town"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
+                    error={!!formErrors.city}
+                    helperText={formErrors.city}
+                    required
+                />
+            </Grid>
 
-
-    const renderPaymentSection = () => (
-        <Box>
-            <Typography variant="h6" gutterBottom>Payment Method</Typography>
-            <RadioGroup name="paymentMethod" value={formData.paymentMethod} onChange={handleInputChange}>
-                <FormControlLabel value="bkash" control={<Radio />} label="bKash" />
-                <FormControlLabel value="nagad" control={<Radio />} label="Nagad" />
-                <FormControlLabel value="dutch-bangla" control={<Radio />} label="Dutch-Bangla Bank" />
-            </RadioGroup>
-            <TextField
-                fullWidth
-                label="Transaction ID"
-                name="transactionId"
-                value={formData.transactionId}
-                onChange={handleInputChange}
-                required
-            />
-        </Box>
+            <Grid item xs={12}>
+                <TextField
+                    fullWidth
+                    label="Address"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    error={!!formErrors.address}
+                    helperText={formErrors.address}
+                    required
+                />
+            </Grid>
+        </Grid>
     );
+
+    const renderPaymentSection = () => {
+        const paymentInstructions = {
+            bkash: {
+                steps: [
+                    "Go to your bKash app or Dial *247#",
+                    "Choose ‘Send Money’",
+                    "Enter below bKash Account Number",
+                    "Enter total amount",
+                    "Now enter your bKash Account PIN to confirm the transaction",
+                    "Copy Transaction ID from payment confirmation message and paste below"
+                ],
+                accountType: "Personal",
+                accountNumber: "017********"
+            },
+            rocket: {
+                steps: [
+                    "Go to your Rocket app or Dial *322#",
+                    "Choose ‘Send Money’",
+                    "Enter below Rocket Account Number",
+                    "Enter total amount",
+                    "Now enter your Rocket Account PIN to confirm the transaction",
+                    "Copy Transaction ID from payment confirmation message and paste below"
+                ],
+                accountType: "Personal",
+                accountNumber: "017********"
+            },
+            nagad: {
+                steps: [
+                    "Go to your Nagad app or Dial *167#",
+                    "Choose ‘Send Money’",
+                    "Enter below Nagad Account Number",
+                    "Enter total amount",
+                    "Now enter your Nagad Account PIN to confirm the transaction",
+                    "Copy Transaction ID from payment confirmation message and paste below"
+                ],
+                accountType: "Personal",
+                accountNumber: "017********"
+            },
+            upay: {
+                steps: [
+                    "Go to your Upay app or Dial *268#",
+                    "Choose ‘Send Money’",
+                    "Enter below Upay Account Number",
+                    "Enter total amount",
+                    "Now enter your Upay Account PIN to confirm the transaction",
+                    "Copy Transaction ID from payment confirmation message and paste below"
+                ],
+                accountType: "Personal",
+                accountNumber: "017********"
+            }
+        };
+
+        const selectedPayment = formData.paymentMethod;
+        const instructions = paymentInstructions[selectedPayment];
+
+        return (
+            <Box>
+                <Typography variant="h6" gutterBottom>Payment Method</Typography>
+                <RadioGroup name="paymentMethod" value={selectedPayment} onChange={handleInputChange}>
+                    {Object.keys(paymentInstructions).map((method) => (
+                        <FormControlLabel
+                            key={method}
+                            value={method}
+                            control={<Radio />}
+                            label={<Box sx={{ display: "flex", alignItems: "center" }}>
+                                <FaMoneyBillWave size={24} style={{ marginRight: "8px" }} />
+                                {method.charAt(0).toUpperCase() + method.slice(1)}
+                            </Box>}
+                        />
+                    ))}
+                </RadioGroup>
+                {instructions && (
+                    <Box sx={{ mt: 2, p: 2, border: "1px solid #ddd", borderRadius: "8px" }}>
+                        <Typography variant="subtitle1">Instructions for {selectedPayment.toUpperCase()}</Typography>
+                        <ul>
+                            {instructions.steps.map((step, index) => (
+                                <li key={index}>{step}</li>
+                            ))}
+                        </ul>
+                        <Typography variant="body1">You need to send: ${calculateTotal().toFixed(2)} /-</Typography>
+                        <Typography variant="body1">Account Type: {instructions.accountType}</Typography>
+                        <Typography variant="body1">Account Number: {instructions.accountNumber}</Typography>
+                        <TextField
+                            fullWidth
+                            label="Your Account Number"
+                            name="senderAccountNumber"
+                            onChange={handleInputChange}
+                            value={formData.senderAccountNumber}
+                            required
+                            sx={{ mt: 2 }}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Transaction ID"
+                            name="transactionId"
+                            onChange={handleInputChange}
+                            value={formData.transactionId}
+                            required
+                            sx={{ mt: 2 }}
+                        />
+                    </Box>
+                )}
+            </Box>
+        );
+    };
+
 
     const renderConfirmation = () => (
         <Box>
@@ -454,9 +611,15 @@ const OrderProcess = () => {
                         </Button>
                     )}
                     {activeStep < steps.length - 1 && (
-                        <Button variant="contained" onClick={handleNext} color="primary">
+                        <Button
+                            variant="contained"
+                            onClick={
+                                isPaymentStep ? submitOrder : handleNext
+                            }
+                            color="primary"
+                            disabled={activeStep === 2 && !formData.transactionId}
+                        >
                             {isPaymentStep ? "Confirm" : isCreateAccountStep ? "Skip" : "Next"}
-
                         </Button>
                     )}
                 </Box>
@@ -466,3 +629,4 @@ const OrderProcess = () => {
 };
 
 export default OrderProcess;
+

@@ -23,9 +23,6 @@ import {
 import { styled } from "@mui/system";
 import { FaMoneyBillWave } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
-import IconButton from '@mui/material/IconButton';
-import InputAdornment from '@mui/material/InputAdornment';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { BaseUrls } from "../env";
 
 const StyledContainer = styled(Container)(({ theme }) => ({
@@ -54,89 +51,6 @@ const OrderProcess = () => {
   const isPaymentStep = isAuthenticated ? activeStep === 2 : activeStep === 3;
   const isCreateAccountStep = isAuthenticated ? false : (activeStep === 1);
 
-
-  const [accountData, setAccountData] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [formValues, setFormValues] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-
-  const handleChange = (field) => (event) => {
-    setFormValues({ ...formValues, [field]: event.target.value });
-  };
-
-  // Call the function when needed
-  // submitOrder();
-
-
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
-
-  const handleLogin = () => {
-    // Implement login logic here
-    console.log("Logging in with", formValues);
-  };
-
-  const handleSignUp = () => {
-    // Implement sign-up logic here
-    if (formValues.password !== formValues.confirmPassword) {
-      setError("Passwords do not match!");
-      return;
-    }
-    console.log("Signing up with", formValues);
-  };
-
-  const handleAccountSubmit = () => {
-    if (!accountData.email || !accountData.password) {
-      setError("Email and Password are required.");
-      return;
-    }
-
-    if (!isAuthenticated && accountData.password !== accountData.confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-
-    // Simulate authentication
-    localStorage.setItem("authToken");
-    setIsAuthenticated(true);
-    setActiveStep((prev) => prev + 1); // Move to next step
-  };
-
-  const handleconfirm = () => {
-    const api_data = {
-
-      ProductID: "",
-      Quantity: "",
-      Price: "",
-      Color: "",
-      Size: "",
-      TotalPrice: "",
-
-      firstName: "",
-      lastName: "",
-      District: "",
-      Upozila: "",
-      city: "",
-      address: "",
-
-      Transaction_phoneNumber: "",
-      paymentMethod: "",
-      transactionId: ""
-    }
-  }
   // cart Details
   useEffect(() => {
     const fetchCartDetails = async () => {
@@ -171,10 +85,9 @@ const OrderProcess = () => {
     }
   }, [token]);
 
-  // Fetch product details and merge with cart data
   useEffect(() => {
     if (!cartItems.length || hasFetched) return;
-
+  
     const fetchItemDetails = async () => {
       try {
         const productPromises = cartItems.map(async (cartItem) => {
@@ -185,153 +98,138 @@ const OrderProcess = () => {
               "Content-Type": "application/json",
             },
           });
-
+  
           if (!response.ok) {
             throw new Error(`Failed to fetch product details for item ${cartItem.item}`);
           }
-
+  
           const productData = await response.json();
-
+  
           return {
-            id: productData.product_id,
+            id: productData.id, // Assuming 'id' is the primary key
+            product_id: productData.product_id, // Keep if needed
             name: productData.title,
             price: productData.price,
             quantity: cartItem.quantity,
-            Product_color: cartItem.item_color_code,
-            image: productData.image,
+            product_color: cartItem.item_color_code,
+            image: productData.image || "", // Ensure image exists
             size: cartItem.item_size,
           };
         });
-
+  
         const mergedCart = await Promise.all(productPromises);
         setHasFetched(true);
         setCartItems(mergedCart);
-
-        console.log("Merged Cart Details:", mergedCart);
-
-        if (mergedCart.length > 0) {
-          const firstItem = mergedCart[0]; // Assign the first item in cart
-          setFormData((prevFormData) => ({
-            ...prevFormData,
-            ProductID: firstItem.id,
-            Quantity: firstItem.quantity,
-            Price: firstItem.price,
-            Color: firstItem.Product_color,
-            Size: firstItem.size,
-            TotalPrice: (firstItem.price * firstItem.quantity) + 80, // Calculate total price
-
-            firstName: "",
-            lastName: "",
-            District: "",
-            Upozila: "",
-            city: "",
-            address: "",
-            paymentMethod: "",
-            transactionId: "",
-          }));
-        }
+  
+        setFormData(prevFormData => ({
+          ...prevFormData,
+          products: mergedCart.map(item => ({
+            product_id: item.product_id,
+            quantity: item.quantity,
+            price: item.price,
+            color: item.product_color,
+            size: item.size,
+          }))
+        }));
+        console.log("Merged Cart Items:", mergedCart);
       } catch (error) {
         console.error("Error fetching product details:", error);
       }
     };
-
+  
     fetchItemDetails();
   }, [cartItems, token, hasFetched]);
 
   async function submitOrder() {
-    const authToken = localStorage.getItem('authToken');
+    const authToken = localStorage.getItem("authToken");
     const user = authToken ? getUserFromToken(authToken) : null;
-
+  
     const orderData = {
-        product_id: formData.ProductID,
-        quantity: formData.Quantity,
-        price: formData.Price,
-        color: formData.Color,
-        size: formData.Size,
-        total_price: formData.TotalPrice,
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        phone_number: formData.Phone,
-        district: formData.District,
-        upozila: formData.Upozila,
-        city: formData.city,
-        address: formData.address,
-        payment_method: formData.paymentMethod,
-        phone_number_pament: formData.senderAccountNumber,
-        transaction_id: formData.transactionId,
-        user: user ? user.id : null
+      user: user ? user.id : null,
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      phone_number: formData.Phone,
+      district: formData.District,
+      upozila: formData.Upozila,
+      city: formData.city,
+      address: formData.address,
+      payment_method: formData.paymentMethod,
+      phone_number_payment: formData.senderAccountNumber,
+      transaction_id: formData.transactionId,
+      order_items: cartItems.map(item => ({
+        product: item.product_id,
+        quantity: item.quantity,
+        price: item.price,
+        color: item.product_color,
+        size: item.size,
+      })),
     };
-
+  
     try {
-        const response = await fetch("http://localhost:8000/api/orders/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                ...(authToken && { Authorization: `Bearer ${authToken}` })
-            },
-            body: JSON.stringify(orderData)
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to submit order");
-        }
-
-        const result = await response.json();
-        console.log("Order submitted successfully:", result);
-        handleNext(); // Move to the next step
+      const response = await fetch("http://localhost:8000/api/orders/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(authToken && { Authorization: `Bearer ${authToken}` }),
+        },
+        body: JSON.stringify(orderData),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to submit order.");
+      }
+  
+      const responseData = await response.json();
+      console.log("Order submitted successfully:", responseData);
+  
     } catch (error) {
-        console.error("Error:", error);
-        alert("Failed to submit order. Please try again.");
+      console.error("Error:", error);
+      alert("Failed to submit order. Please try again.");
+      console.log("Order Data:", orderData);
     }
-}
+  }
+  
   // Function to decode JWT and extract user info
   function getUserFromToken(token) {
     try {
-      const payload = JSON.parse(atob(token.split('.')[1])); // Decode JWT payload
-      return payload.user_id || payload.username || null; // Adjust based on your token structure
+      const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
+      return { id: payload.user_id || null, username: payload.username || null }; // Adjust based on backend token structure
     } catch (error) {
       console.error("Invalid token:", error);
       return null;
     }
   }
-
-
+  
   const [formData, setFormData] = useState({
-    ProductID: "",
-    Quantity: "",
-    Price: "",
-    Color: "",
-    Size: "",
-    TotalPrice: "",
-
+    products: [],
     firstName: "",
     lastName: "",
+    Phone: "",
     District: "",
     Upozila: "",
     city: "",
     address: "",
-
     paymentMethod: "",
-    transactionId: ""
+    senderAccountNumber: "",
+    transactionId: "",
   });
-
+  
   const steps = isAuthenticated
     ? ["Cart Summary", "Shipping Details", "Payment", "Confirmation"]
     : ["Cart Summary", "Create Account", "Shipping Details", "Payment", "Confirmation"];
-
-
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
+  
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
-
+  
     validateField(name, value); // Keep validation
     console.log("Form Data:", { ...formData, [name]: value });
   };
-
+  
 
   const validateField = (name, value) => {
     let errors = { ...formErrors };
@@ -402,7 +300,10 @@ const OrderProcess = () => {
                   Quantity: {item.quantity}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                  Color : {item.Product_color}
+                  Color : {item.product_color}
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  Size : {item.size}
                 </Typography>
                 <Typography variant="h6" color="primary">
                   Price : ${(item.price * item.quantity).toFixed(2)}
@@ -507,102 +408,6 @@ const OrderProcess = () => {
         />
       </Grid>
     </Grid>
-  );
-
-  const [loginButtonClicked, setloginButtonClicked] = useState(false);
-
-  const renderCreateAccount = () => (
-    <Box sx={{ maxWidth: 400, mx: "auto", mt: 4, p: 4, bgcolor: "white", borderRadius: 2, boxShadow: 3, textAlign: "center" }}>
-      <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
-        {loginButtonClicked ? "Welcome Back!" : "Welcome To Bindu-Britto!"}
-      </Typography>
-      <Typography variant="body1" sx={{ color: "text.secondary", mb: 3 }}>
-        {loginButtonClicked ? "Log in to your account" : "Register Now"}
-      </Typography>
-
-      {error && (
-        <Typography color="error" sx={{ mb: 2 }}>
-          {error}
-        </Typography>
-      )}
-
-      <TextField
-        label="Email Address"
-        variant="outlined"
-        fullWidth
-        value={formValues.email}
-        onChange={handleChange("email")}
-        sx={{ mb: 2 }}
-      />
-
-      <TextField
-        label="Password"
-        variant="outlined"
-        fullWidth
-        type={showPassword ? "text" : "password"}
-        value={formValues.password}
-        onChange={handleChange("password")}
-        sx={{ mb: 2 }}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                onClick={handleClickShowPassword}
-                onMouseDown={handleMouseDownPassword}
-                edge="end"
-              >
-                {showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
-
-      {!loginButtonClicked && (
-        <TextField
-          label="Confirm Password"
-          variant="outlined"
-          fullWidth
-          type={showPassword ? "text" : "password"}
-          value={formValues.confirmPassword}
-          onChange={handleChange("confirmPassword")}
-          sx={{ mb: 3 }}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                  edge="end"
-                >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-      )}
-
-      <Button
-        variant="contained"
-        fullWidth
-        color="primary"
-        sx={{ mb: 2, fontWeight: "bold", textTransform: "none" }}
-        onClick={loginButtonClicked ? handleLogin : handleSignUp}
-      >
-        {loginButtonClicked ? "Log In" : "Sign Up"}
-      </Button>
-
-
-      <Button
-        variant="text"
-        onClick={() => setloginButtonClicked(!loginButtonClicked)}
-        sx={{ color: "#1976d2", textTransform: "none", mt: 1 }}
-      >
-        {loginButtonClicked ? "Don't have an account? Sign up" : "Already have an account? Sign in."}
-      </Button>
-
-    </Box>
   );
 
   const renderPaymentSection = () => {
@@ -749,11 +554,9 @@ const OrderProcess = () => {
       </Paper>
     </Box>
   );
-  const getStepContent = (step) => {
-    const steps = isAuthenticated
-      ? [renderCartSummary, renderShippingForm, renderPaymentSection, renderConfirmation]
-      : [renderCartSummary, renderCreateAccount, renderShippingForm, renderPaymentSection, renderConfirmation];
 
+  const getStepContent = (step) => {
+    const steps = [renderCartSummary, renderShippingForm, renderPaymentSection, renderConfirmation]
     return steps[step] ? steps[step]() : "Unknown step";
   };
 

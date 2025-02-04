@@ -126,7 +126,7 @@ const ProductDetails = () => {
 
     // Store the selected product details in provider
     setProducts(selectedItem);
-    navigate(`/order/${items.product_id}`);
+    navigate(`/order/${items.product_id}/${selectedColor}/${quantity}/${selectedSize}`);
 
     console.log("Items Details:", items);
     console.log("Quantity:", quantity);
