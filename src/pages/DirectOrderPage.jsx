@@ -146,7 +146,7 @@ const OrderProcess = () => {
     };
 
     try {
-        const response = await fetch("http://localhost:8000/api/orders/", {
+        const response = await fetch(`${BaseUrls}api/orders/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

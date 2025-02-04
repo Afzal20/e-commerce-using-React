@@ -37,7 +37,7 @@ export const resetPasswordConfirm = ( uid, token, new_password1, new_password2 )
     };
     const body = JSON.stringify({ uid, token, new_password1, new_password2 });
     try {
-        await axios.post("http://localhost:8000/dj-rest-auth/password/reset/confirm/", body, config);
+        await axios.post(`${BaseUrls}dj-rest-auth/password/reset/confirm/`, body, config);
         dispatch ({
             type: TYPE.SET_SUCCESS
         });
