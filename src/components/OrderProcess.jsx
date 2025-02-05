@@ -55,7 +55,7 @@ const OrderProcess = () => {
   useEffect(() => {
     const fetchCartDetails = async () => {
       try {
-        const response = await fetch(`${BaseUrls}/api/cart/`, {
+        const response = await fetch(`${BaseUrls}api/cart/`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -91,7 +91,7 @@ const OrderProcess = () => {
     const fetchItemDetails = async () => {
       try {
         const productPromises = cartItems.map(async (cartItem) => {
-          const response = await fetch(`${BaseUrls}/api/product/${cartItem.item}/`, {
+          const response = await fetch(`${BaseUrls}api/product/${cartItem.item}/`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,

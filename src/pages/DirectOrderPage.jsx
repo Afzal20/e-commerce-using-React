@@ -48,7 +48,7 @@ const OrderProcess = () => {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [activeStep, setActiveStep] = useState(0);  
+    const [activeStep, setActiveStep] = useState(0);
     const [orderComplete, setOrderComplete] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const token = localStorage.getItem("authToken");
@@ -64,19 +64,19 @@ const OrderProcess = () => {
     const [showPassword, setShowPassword] = useState(false);
 
 
-  const [formData, setFormData] = useState({
-    products: [],
-    firstName: "",
-    lastName: "",
-    Phone: "",
-    District: "",
-    Upozila: "",
-    city: "",
-    address: "",
-    paymentMethod: "",
-    senderAccountNumber: "",
-    transactionId: "",
-  });
+    const [formData, setFormData] = useState({
+        products: [],
+        firstName: "",
+        lastName: "",
+        Phone: "",
+        District: "",
+        Upozila: "",
+        city: "",
+        address: "",
+        paymentMethod: "",
+        senderAccountNumber: "",
+        transactionId: "",
+    });
 
     const handleChange = (field) => (event) => {
         setFormValues({ ...formValues, [field]: event.target.value });
@@ -107,66 +107,66 @@ const OrderProcess = () => {
         }
     }, [token]);
 
-      // Function to decode JWT and extract user info
-  function getUserFromToken(token) {
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
-      return { id: payload.user_id || null, username: payload.username || null }; // Adjust based on backend token structure
-    } catch (error) {
-      console.error("Invalid token:", error);
-      return null;
-    }
-  }
-
-  async function submitOrder() {
-    const authToken = localStorage.getItem("authToken");
-    const user = authToken ? getUserFromToken(authToken) : null;
-
-    const orderData = {
-        user: user ? user.id : null,
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        phone_number: formData.Phone,
-        district: formData.District,
-        upozila: formData.Upozila,
-        city: formData.city,
-        address: formData.address,
-        payment_method: formData.paymentMethod,
-        phone_number_payment: formData.senderAccountNumber,
-        transaction_id: formData.transactionId,
-        order_items: [
-            {
-                product: product_id,
-                quantity: quantity,
-                price: product.price,
-                color: color,
-                size: size,
-            },
-        ],
-    };
-
-    try {
-        const response = await fetch(`${BaseUrls}api/orders/`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                ...(authToken && { Authorization: `Bearer ${authToken}` }),
-            },
-            body: JSON.stringify(orderData),
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to submit order.");
+    // Function to decode JWT and extract user info
+    function getUserFromToken(token) {
+        try {
+            const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
+            return { id: payload.user_id || null, username: payload.username || null }; // Adjust based on backend token structure
+        } catch (error) {
+            console.error("Invalid token:", error);
+            return null;
         }
-
-        const responseData = await response.json();
-        console.log("Order submitted successfully:", responseData);
-        setOrderComplete(true); // Mark order as complete
-    } catch (error) {
-        console.error("Error:", error);
-        setError("Failed to submit order. Please try again.");
     }
-}
+
+    async function submitOrder() {
+        const authToken = localStorage.getItem("authToken");
+        const user = authToken ? getUserFromToken(authToken) : null;
+
+        const orderData = {
+            user: user ? user.id : null,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            phone_number: formData.Phone,
+            district: formData.District,
+            upozila: formData.Upozila,
+            city: formData.city,
+            address: formData.address,
+            payment_method: formData.paymentMethod,
+            phone_number_payment: formData.senderAccountNumber,
+            transaction_id: formData.transactionId,
+            order_items: [
+                {
+                    product: product_id,
+                    quantity: quantity,
+                    price: product.price,
+                    color: color,
+                    size: size,
+                },
+            ],
+        };
+
+        try {
+            const response = await fetch(`${BaseUrls}api/orders/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(authToken && { Authorization: `Bearer ${authToken}` }),
+                },
+                body: JSON.stringify(orderData),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to submit order.");
+            }
+
+            const responseData = await response.json();
+            console.log("Order submitted successfully:", responseData);
+            setOrderComplete(true); // Mark order as complete
+        } catch (error) {
+            console.error("Error:", error);
+            setError("Failed to submit order. Please try again.");
+        }
+    }
 
     const steps = isAuthenticated
         ? ["Cart Summary", "Shipping Details", "Payment", "Confirmation"]
@@ -201,18 +201,85 @@ const OrderProcess = () => {
         event.preventDefault();
     };
 
-    const handleLogin = () => {
+    const handleLogin = async (event) => {
         // Implement login logic here
-        console.log("Logging in with", formValues);
-    };
+        event.preventDefault();
 
-    const handleSignUp = () => {
-        // Implement sign-up logic here
-        if (formValues.password !== formValues.confirmPassword) {
-            setError("Passwords do not match!");
+        // Validate input fields
+        if (!formValues.email || !formValues.password) {
+            setError("Email and password are required.");
             return;
         }
-        console.log("Signing up with", formValues);
+
+        try {
+            // Set headers
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            };
+
+            // Create request body
+            const body = {
+                username: "",
+                email: formValues.email,
+                password: formValues.password,
+            };
+
+            // Send login request
+            const response = await axios.post(
+                `${BaseUrls}/dj-rest-auth/login/`,
+                body,
+                config
+            );
+
+            // Extract the token from the response
+            const authToken = response;
+
+            // Store the token securely in localStorage
+            localStorage.setItem("authToken", authToken.data.access);
+            localStorage.setItem("user", JSON.stringify(authToken.data.user));
+            console.log("Token stored:", authToken.data.access);
+
+            // Success message
+            alert("Login successful!");
+
+            // Clear errors and form fields
+            setError("");
+            setFormValues({ email: "", password: "" });
+
+        } catch (err) {
+            console.error("Error during login:", err.response?.data || err.message);
+
+            // Display user-friendly error messages
+            if (err.response?.data?.non_field_errors) {
+                setError(err.response.data.non_field_errors.join(" "));
+            } else if (err.response?.status === 400) {
+                setError("Invalid credentials. Please try again.");
+            } else {
+                setError("Something went wrong. Please try again later.");
+            }
+        }
+
+        console.log("Logging in with", formValues);
+
+    };
+
+    const handleSignUp = async (event) => {
+        event.preventDefault();
+        try {
+            await axios.post(`${BaseUrls}dj-rest-auth/registration/`, {
+                email: formValues.email,
+                password1: formValues.password,
+                password2: formValues.confirmPassword,
+            });
+            alert('Registration successful! check your email to verify your account.');
+            handleLogin(event);
+
+        } catch (error) {
+            console.error('Error during registration:', error.response?.data || error.message);
+            alert('Registration failed! Please try again latter.');
+        }
     };
 
     const [loginButtonClicked, setloginButtonClicked] = useState(false);

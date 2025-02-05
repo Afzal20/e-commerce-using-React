@@ -1,49 +1,50 @@
 import React, { useState } from 'react';
-import { Container, TextField, Button, Typography, Box } from '@mui/material';
+import axios from 'axios';
+import { TextField, Button, Alert, Box } from "@mui/material";
 
-const ResetPassword = () => {
-    const [email, setEmail] = useState('');
 
-    const handleEmailChange = (event) => {
-        setEmail(event.target.value);
-    };
+const PasswordResetRequest = () => {
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState(null);
 
-    const handleResetPassword = () => {
-        
-        console.log('Reset password for:', email);
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        'http://localhost:8000/dj-rest-auth/password/reset/',
+        { email }
+      );
+      setMessage('An email has been sent to reset your password.');
+      setError(null);
+    } catch (err) {
+      setError(err.response?.data?.detail || 'An error occurred while sending reset email.');
+      setMessage('');
+    }
+  };
 
-    return (
-        <Container maxWidth="sm">
-            <Box
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                justifyContent="center"
-                minHeight="100vh"
-            >
-                <Typography variant="h4" gutterBottom>
-                    Reset Password
-                </Typography>
-                <TextField
-                    label="Email"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    value={email}
-                    onChange={handleEmailChange}
-                />
-                <Button
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                    onClick={handleResetPassword}
-                >
-                    Reset Password
-                </Button>
-            </Box>
-        </Container>
-    );
+  return (
+    <><Box sx={{ height: '20px' }}/>
+    <form onSubmit={handleSubmit} style={{ maxWidth: '400px', margin: '0 auto', padding: '20px' }}>
+      <TextField
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        label="Enter your email"
+        variant="outlined"
+        fullWidth
+        required
+        margin="normal"
+      />
+      <Button type="submit" variant="contained" color="primary" fullWidth>
+        Reset Password
+      </Button>
+      {message && <Alert severity="success" style={{ marginTop: '20px' }}>{message}</Alert>}
+      {error && <Alert severity="error" style={{ marginTop: '20px' }}>{error}</Alert>}
+    </form>
+    <Box sx={{ height: '20px' }}/>
+    </>
+  );
 };
 
-export default ResetPassword;
+export default PasswordResetRequest;

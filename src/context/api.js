@@ -15,7 +15,7 @@ export const fetchItems = async () => {
 };
 
 export const fetchCategories = async () => {
-  const response = await fetch(`${BaseUrls}/api/categories/`);
+  const response = await fetch(`${BaseUrls}api/categories/`);
   if (!response.ok) throw new Error('Failed to fetch categories');
   return response.json();
 };

@@ -28,8 +28,8 @@ export default function CustomLoginForm() {
   const handleChange = (prop) => (event) => {
     setFormValues({ ...formValues, [prop]: event.target.value });
   };
-  const navigate = useNavigate(); 
 
+  const navigate = useNavigate();
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -49,26 +49,25 @@ export default function CustomLoginForm() {
       };
 
       // Create request body
-      const body = {
-        username: "", 
+      const body = JSON.stringify({
         email: formValues.email,
         password: formValues.password,
-      };
+      });
 
       // Send login request
       const response = await axios.post(
-        `${BaseUrls}/dj-rest-auth/login/`,
+        `${BaseUrls}dj-rest-auth/login/`,
         body,
         config
       );
 
       // Extract the token from the response
-      const authToken = response;
+      const authToken = response.data;
 
       // Store the token securely in localStorage
-      localStorage.setItem("authToken", authToken.data.access);
-      localStorage.setItem("user", JSON.stringify(authToken.data.user));
-      console.log("Token stored:", authToken.data.access);
+      localStorage.setItem("authToken", authToken.access);
+      localStorage.setItem("user", JSON.stringify(authToken.user));
+      console.log("Token stored:", authToken.access);
 
       // Success message
       alert("Login successful!");
@@ -77,22 +76,23 @@ export default function CustomLoginForm() {
       setError("");
       setFormValues({ email: "", password: "" });
 
-      // Redirect to the home page (using React Router's `useNavigate`)
+      // Redirect to the home page
       navigate("/");
     } catch (err) {
       console.error("Error during login:", err.response?.data || err.message);
 
-      // Display user-friendly error messages
-      if (err.response?.data?.non_field_errors) {
-        setError(err.response.data.non_field_errors.join(" "));
-      } else if (err.response?.status === 400) {
-        setError("Invalid credentials. Please try again.");
+      // Display specific error messages based on backend response
+      if (err.response?.data) {
+        for (const field in err.response.data) {
+          setError(err.response.data[field].join(" "));
+          break;  // Assuming we only show one error at a time
+        }
       } else {
-        setError("Something went wrong. Please try again later.");
+        setError("An unexpected error occurred. Please try again.");
       }
     }
   };
-  
+
   return (
     <Box
       sx={{
@@ -118,22 +118,6 @@ export default function CustomLoginForm() {
           {error}
         </Typography>
       )}
-
-      {/* <Button
-        variant="outlined"
-        fullWidth
-        startIcon={<img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google icon" width="20" />}
-        sx={{
-          mb: 2,
-          textTransform: 'none',
-          color: 'text.primary',
-          borderColor: 'grey.400',
-        }}
-      >
-        Log in with Google
-      </Button> */}
-
-      {/* <Divider sx={{ my: 2 }}>or</Divider> */}
 
       <TextField
         label="Email address"
@@ -178,7 +162,7 @@ export default function CustomLoginForm() {
       </Button>
 
       <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-        <a href="#" style={{ color: '#1976d2', textDecoration: 'none' }}>Forgot your password?</a>
+        <a href="/reset/password" style={{ color: '#1976d2', textDecoration: 'none' }}>Forgot your password?</a>
       </Typography>
       <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
         <a href="/register" style={{ color: '#1976d2', textDecoration: 'none' }}>

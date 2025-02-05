@@ -43,7 +43,7 @@ const Cart = () => {
   useEffect(() => {
     const fetchCartDetails = async () => {
       try {
-        const response = await fetch(`${BaseUrls}/api/cart/`, {
+        const response = await fetch(`${BaseUrls}api/cart/`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -71,7 +71,7 @@ const Cart = () => {
       try {
         const productPromises = cartItems.map(async (item) => {
           const response = await fetch(
-            `${BaseUrls}/api/product/${item.item}/`,
+            `${BaseUrls}api/product/${item.item}/`,
             {
               method: "GET",
               headers: {
@@ -105,7 +105,7 @@ const Cart = () => {
     setLoading(true);
   
     try {
-      const response = await fetch(`${BaseUrls}/api/cart/update/${id}/`, {
+      const response = await fetch(`${BaseUrls}api/cart/update/${id}/`, {
         method: "PATCH", // Use PATCH to update only the quantity field
         headers: {
           Authorization: `Bearer ${token}`,
@@ -137,7 +137,7 @@ const Cart = () => {
   const removeItem = async (id) => {
     setLoading(true);
     try {
-      const response = await fetch(`${BaseUrls}/api/cart/remove/${id}/`, {
+      const response = await fetch(`${BaseUrls}api/cart/remove/${id}/`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

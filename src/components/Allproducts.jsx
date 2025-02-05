@@ -47,6 +47,7 @@ const AllProducts = ({ selectedCategories }) => {
           </Typography>
         )}
       </Grid>
+      <Box sx={{ height: 10 }} />
     </Container>
   );
 };

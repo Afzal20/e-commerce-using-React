@@ -30,7 +30,7 @@ export default function CustomRegistrationForm() {
   const handleSignUp = async (event) => {
     event.preventDefault();
     try {
-      await axios.post(`${BaseUrls}/dj-rest-auth/registration/`, {
+      await axios.post(`${BaseUrls}dj-rest-auth/registration/`, {
         email: formValues.email,
         password1: formValues.password,
         password2: formValues.confirmPassword,

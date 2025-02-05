@@ -9,6 +9,7 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import PersonIcon from '@mui/icons-material/AccountCircle';
 import logo from "../assets/img/logo-2-300x124.png";
 import { BaseUrls } from '../env';
+import { useNavigate } from 'react-router-dom';
 
 const Search = styled('div')(({ theme }) => ({
     color: "#E7C400",
@@ -64,34 +65,50 @@ export default function Navbar() {
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
     const token = localStorage.getItem('authToken');
+    const navigate = useNavigate();
 
     const [totalCartItems, setTotalCartItems] = React.useState(0);
-    
+    const [searchText, setSearchText] = React.useState('');
+
     React.useEffect(() => {
         const fetchCartItems = async () => {
-          try {
-            const response = await fetch(`${BaseUrls}/api/cart/`, {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            });
-    
-            if (!response.ok) {
-              throw new Error("Failed to fetch cart data");
+            try {
+                const response = await fetch(`${BaseUrls}api/cart/`, {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch cart data");
+                }
+
+                const data = await response.json();
+                setTotalCartItems(data.length || 0);
+                console.log("Cart Data:", data.length);
+            } catch (error) {
+                console.error("Error fetching cart items:", error);
             }
-    
-            const data = await response.json();
-            setTotalCartItems(data.length || 0);
-            console.log("Cart Data:", data.length);
-          } catch (error) {
-            console.error("Error fetching cart items:", error);
-          }
         };
-    
+
         fetchCartItems();
-      }, [token]);
+    }, [token]);
+
+    // New method to handle search
+    const handleSearch = (event) => {
+        if (event.type === 'click' || event.key === 'Enter') {
+            console.log('Search text:', searchText);
+            // Here you can also trigger an API call or route change with searchText
+            navigate(`/search?q=${searchText}`);
+        }
+    };
+
+    // Handle changes in the search input
+    const handleSearchChange = (event) => {
+        setSearchText(event.target.value);
+    };
 
     const handleMobileMenuClose = () => {
         setMobileMoreAnchorEl(null);
@@ -152,11 +169,14 @@ export default function Navbar() {
                     </Typography>
                     <Search>
                         <SearchIconWrapper>
-                            <SearchIcon sx={{ color: "#E7C400" }} />
+                            <SearchIcon sx={{ color: "#E7C400" }} onClick={handleSearch} />
                         </SearchIconWrapper>
                         <StyledInputBase
                             placeholder="Search…"
                             inputProps={{ 'aria-label': 'search' }}
+                            value={searchText}
+                            onChange={handleSearchChange}
+                            onKeyDown={handleSearch}
                         />
                     </Search>
                     <Box sx={{ flexGrow: 1 }} />

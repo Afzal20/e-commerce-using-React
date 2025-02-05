@@ -14,7 +14,7 @@ import { useProducts } from '../context/ProductsContext';
 
 const ProductDetails = () => {
   const { product_id } = useParams();
-  const ItemsUrls = `${BaseUrls}/api/items/${product_id}/`;
+  const ItemsUrls = `${BaseUrls}api/items/${product_id}/`;
   const [items, setItems] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);

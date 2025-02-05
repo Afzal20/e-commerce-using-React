@@ -30,7 +30,7 @@ const PersistentDrawerLeft = ({ open, handleDrawerClose, onCategorySelect }) => 
     // Fetch categories from the API
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`${BaseUrls}/api/categories/`);
+        const response = await fetch(`${BaseUrls}api/categories/`);
         if (response.ok) {
           const data = await response.json();
           setCategories(data);
